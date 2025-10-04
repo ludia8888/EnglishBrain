@@ -134,24 +134,38 @@ _Refs: PRD §6.2(3단계 미션), §6.3(오답 교정), UserFlow §3–4, OpenAP
 - ✅ Phase indicators with color-coded UI (warm-up=orange, focus=blue, cool-down=teal)
 - 📂 Architecture: Features/Session/{Views,ViewModels,Models}
 
-## Sprint 4 — Personalization & Review Experience
+## Sprint 4 — Personalization & Review Experience ✅
 _Target: Week 6-8 / PRD M3_
 
 _Refs: PRD §6.4(패턴 정복, 검증 지표), UserFlow §5, OpenAPI `/patterns`, `/users/me/pattern-conquests`, `/reviews` suite._
 
-- [ ] **Pattern Detail**
-  - [ ] Create pattern dashboard displaying conquest rate, trend, hintRate/firstTryRate graphs.
-  - [ ] Fetch `/users/me/pattern-conquests`; gracefully handle "데이터 수집 중" state.
-  - [ ] Brain Map visualization (node-link view) for unlocked patterns; consume backend Brain Map feed.
-  - [ ] Git: commit `feat(patterns): dashboard view`.
+- [x] **Pattern Detail**
+  - [x] Create pattern dashboard displaying conquest rate, trend, hintRate/firstTryRate graphs.
+  - [x] Fetch `/users/me/pattern-conquests`; gracefully handle "데이터 수집 중" state.
+  - [x] Git: commit `feat(patterns): dashboard view`.
+- [x] **Tab Navigation**
+  - [x] Implement MainTabView with Home/Patterns/Profile tabs
+  - [x] Create ProfileView with settings and onboarding reset
 - [ ] **Review Launcher**
   - [ ] Trigger review plan creation (`POST /reviews`) from pattern cards and session summary.
   - [ ] Build review session UI (5–8 items) reusing session components with altered pacing.
   - [ ] CI checkpoint: UI tests for review loop; data mocks validated.
   - [ ] Git: commit `feat(review): mini-course flow`.
 - [ ] **Progress Visualization**
+  - [ ] Brain Map visualization (node-link view) for unlocked patterns; consume backend Brain Map feed.
   - [ ] Weekly growth chart (sparklines) & conquest delta messaging.
   - [ ] Badge animations for threshold crossings (>=80%, etc.).
+
+**Implementation Notes (2025-10-04):**
+- ✅ Built PatternDetailViewModel with PatternsAPI.getPatternConquests integration
+- ✅ Created PatternDetailView with conquest rate visualization, stats cards, metrics grid
+- ✅ Implemented PatternsListView categorizing patterns as weak/improving/mastered
+- ✅ Added data collection state handling for new users
+- ✅ Built MainTabView with Home/Patterns/Profile navigation
+- ✅ Created ProfileView with user info, learning settings, app info sections
+- ✅ Updated ContentView to use MainTabView root navigation
+- ✅ Fixed API response properties (data.patterns instead of data.conquests)
+- 📂 Architecture: Features/Patterns/{Views,ViewModels}, Features/Profile/Views, App/MainTabView
 
 ## Sprint 5 — Habit Loop, Brain Tokens, Brain Burst
 _Target: Week 8-10 / PRD M3-M4_
