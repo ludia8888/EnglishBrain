@@ -57,6 +57,10 @@ struct LevelTestView: View {
                     .scaleEffect(1.5)
             }
         }
+        .onAppear {
+            // Connect onComplete callback to viewModel
+            viewModel.onComplete = onComplete
+        }
     }
 
     // MARK: - Subviews
@@ -67,7 +71,7 @@ struct LevelTestView: View {
                 .font(.ebH3)
                 .foregroundColor(.ebTextPrimary)
             Spacer()
-            Text("\(viewModel.currentItemIndex + 1)/10")
+            Text("\(viewModel.currentItemIndex + 1)/\(viewModel.items.count)")
                 .font(.ebLabel)
                 .foregroundColor(.ebTextSecondary)
         }
@@ -300,14 +304,17 @@ struct SlotDropDelegate: DropDelegate {
     func performDrop(info: DropInfo) -> Bool {
         guard let itemProvider = info.itemProviders(for: [.text]).first else { return false }
 
-        itemProvider.loadItem(forTypeIdentifier: "public.text", options: nil) { data, error in
+        itemProvider.loadItem(forTypeIdentifier: "public.text", options: nil) { [weak viewModel] data, error in
             guard let data = data as? Data,
-                  let tokenId = String(data: data, encoding: .utf8),
-                  let token = viewModel.availableTokens.first(where: { $0.id == tokenId }) else {
+                  let tokenId = String(data: data, encoding: .utf8) else {
                 return
             }
 
-            DispatchQueue.main.async {
+            Task { @MainActor in
+                guard let viewModel = viewModel,
+                      let token = viewModel.availableTokens.first(where: { $0.id == tokenId }) else {
+                    return
+                }
                 viewModel.placeToken(token, in: slotIndex)
             }
         }

@@ -10,6 +10,7 @@ import EnglishBrainAPI
 
 struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
+    @EnvironmentObject private var deepLinkRouter: DeepLinkRouter
     @State private var showSession = false
     @State private var showReview = false
     @State private var selectedPatternId: String?
@@ -144,7 +145,7 @@ struct HomeView: View {
 
             // Profile button
             Button(action: {
-                print("Open profile")
+                deepLinkRouter.handle(deeplink: "/profile")
             }) {
                 Image(systemName: "person.circle.fill")
                     .font(.system(size: 32))
@@ -187,9 +188,11 @@ struct ActionCard: View {
         }
     }
 
+    @EnvironmentObject private var deepLinkRouter: DeepLinkRouter
+
     var body: some View {
         Button(action: {
-            print("Action tapped: \(action.deeplink)")
+            deepLinkRouter.handle(deeplink: action.deeplink)
         }) {
             HStack(spacing: 16) {
                 Image(systemName: typeIcon)
