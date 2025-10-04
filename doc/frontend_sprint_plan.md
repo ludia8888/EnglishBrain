@@ -178,23 +178,32 @@ _Target: Week 8-10 / PRD M3-M4_
 
 _Refs: PRD §6.6(스트릭/Brain Token), §6.8 Brain Burst (M4 표), UserFlow §6–8, OpenAPI `/streaks/freeze`, `/notifications/digest`, `/notifications/{id}/open`, `/live-activities`, `/purchases`, `/purchases/me`._
 
-- [ ] **Streak & Brain Token UI**
-  - [ ] Implement streak calendar, milestone badges, Brain Token inventory with usage flow (`POST /streaks/freeze`).
-  - [ ] Offline queuing for streak freeze attempts; show pending state.
-  - [ ] Git: commit `feat/habit): streak & brain token UI`.
+- [x] **Streak & Brain Token UI**
+  - [x] Implement streak calendar, milestone badges, Brain Token inventory with usage flow (`POST /streaks/freeze`).
+  - [x] Offline queuing for streak freeze attempts; show pending state.
+  - [x] Git: commit `feat(streak): streak & brain token UI`.
 - [ ] **Brain Burst Presentation**
   - [ ] Surface Brain Burst activation (lightning animation, bonus indicator) from session payload.
   - [ ] Apply bonus multipliers to scoring visuals; handle cooldown messaging.
   - [ ] Log analytics events (client) mirroring backend.
   - [ ] CI checkpoint: animation performance (profiling) before release; ensure analytics instrumentation tests.
-  - [ ] Git: commit `feat/habit): brain burst UI`.
+  - [ ] Git: commit `feat(habit): brain burst UI`.
 - [ ] **Notifications & Deep Links**
   - [ ] Render notification digest (pattern, streak, encouragement) and map deep links into router.
   - [ ] Track opens (`POST /notifications/{id}/open`) and optional dismissal reasons.
-  - [ ] Git: commit `feat/habit): notification digest`.
+  - [ ] Git: commit `feat(habit): notification digest`.
 - [ ] **Live Activity Integration**
   - [ ] Register Live Activity at session start (`POST /live-activities`); update checkpoints & combos; end gracefully.
   - [ ] Handle ActivityKit push updates & fallback for unsupported devices.
+
+**Implementation Notes (2025-10-04):**
+- ✅ Created StreakCalendarView with monthly calendar grid, completed/frozen date indicators
+- ✅ Built BrainTokenInventoryView with token counts, freeze sheet UI, reason selection
+- ✅ Implemented StreakViewModel with NotificationsAPI.createStreakFreeze integration
+- ✅ Added offline queue for streak freeze requests with automatic retry mechanism
+- ✅ Updated ProfileView with streak calendar and Brain Token inventory sections
+- ✅ Integrated freeze eligibility checks and pending request indicators
+- 📂 Architecture: Features/Streak/{Views,ViewModels}
 
 ## Sprint 6 — Widgets, Shortcuts, Paywall
 _Target: Week 9-11 / PRD M4_
