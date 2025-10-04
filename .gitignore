@@ -1,0 +1,37 @@
+# Xcode
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+*.xcworkspace/*
+!*.xcworkspace/contents.xcworkspacedata
+!*.xcworkspace/xcshareddata/
+
+# User settings
+xcuserdata/
+*.xcuserdatad/
+
+# Build
+build/
+DerivedData/
+*.build/
+.build/
+
+# Swift Package Manager
+.swiftpm/
+*.resolved
+Packages/
+Package.resolved
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# OpenAPI Generator
+.openapi-generator/
+sdk-swift/.openapi-generator-ignore
+sdk-swift/.openapi-generator/
+
+# IDE
+.idea/
+.vscode/

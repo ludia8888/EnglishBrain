@@ -1,0 +1,2290 @@
+openapi: 3.1.0
+info:
+  title: English Brain API
+  version: 0.1.0
+  description: |
+    API surface for English Brain mobile clients powering onboarding, daily learning sessions,
+    personalization, and telemetry. The specification is designed as the single source of truth
+    for documentation (Swagger UI/Redoc), SDK generation (openapi-generator), mock servers (Prism),
+    test collections (Postman), and contract testing pipelines.
+  contact:
+    name: English Brain Platform Team
+    email: api@englishbrain.app
+jsonSchemaDialect: https://json-schema.org/draft/2020-12/schema
+servers:
+  - url: https://api.englishbrain.app/v1
+    description: Production
+  - url: https://staging-api.englishbrain.app/v1
+    description: Staging
+  - url: http://localhost:8080/v1
+    description: Local development
+security:
+  - FirebaseAuth: []
+tags:
+  - name: Users
+    description: Profile, preferences, and home dashboard data.
+  - name: Onboarding
+    description: Level test and tutorial completion workflows.
+  - name: Sessions
+    description: Creation and lifecycle of daily learning sessions.
+  - name: Attempts
+    description: Item-level attempts, checkpoints, and in-session telemetry.
+  - name: Patterns
+    description: Pattern conquest tracking and personalization insights.
+  - name: Reviews
+    description: Personalized review plans and outcomes.
+  - name: Notifications
+    description: Push notifications, streak freezes, and habit loops.
+  - name: Telemetry
+    description: Low-latency product telemetry and offline sync.
+  - name: LiveActivities
+    description: ActivityKit integrations for real-time session status.
+  - name: Privacy
+    description: User-initiated privacy operations (export and deletion requests).
+paths:
+  /users/me:
+    get:
+      tags:
+        - Users
+      summary: Get current user profile
+      operationId: getCurrentUser
+      responses:
+        '200':
+          description: Current user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+    patch:
+      tags:
+        - Users
+      summary: Update mutable profile fields
+      operationId: updateCurrentUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileUpdate'
+      responses:
+        '200':
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /users/me/home:
+    get:
+      tags:
+        - Users
+      summary: Get home dashboard summary
+      operationId: getHomeSummary
+      responses:
+        '200':
+          description: Aggregated home data including goals, streak, and pattern cards
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HomeSummary'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /users/me/widget-snapshot:
+    get:
+      tags:
+        - Users
+      summary: Get compact snapshot for WidgetKit timelines
+      operationId: getWidgetSnapshot
+      responses:
+        '200':
+          description: Widget snapshot data (streak, remaining sentences, next reward)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WidgetSnapshot'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /users/me/tutorial-completions:
+    post:
+      tags:
+        - Onboarding
+      summary: Record tutorial completion milestone
+      operationId: createTutorialCompletion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TutorialCompletionRequest'
+      responses:
+        '202':
+          description: Tutorial completion accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TutorialCompletionResponse'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /users/me/data-deletion-requests:
+    post:
+      tags:
+        - Privacy
+      summary: Submit a user-initiated data deletion request
+      operationId: createDataDeletionRequest
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataDeletionRequest'
+      responses:
+        '202':
+          description: Data deletion request accepted for processing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataDeletionResponse'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /users/me/data-export-requests:
+    post:
+      tags:
+        - Privacy
+      summary: Submit a user-initiated data export request
+      operationId: createDataExportRequest
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataExportRequest'
+      responses:
+        '202':
+          description: Data export request accepted for processing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataExportResponse'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /level-tests:
+    post:
+      tags:
+        - Onboarding
+      summary: Submit level test answers and compute recommended level
+      operationId: submitLevelTest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LevelTestSubmission'
+      responses:
+        '200':
+          description: Level recommendation and calibration metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LevelTestResult'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /sessions:
+    post:
+      tags:
+        - Sessions
+      summary: Create a new learning session package
+      operationId: createSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionCreateRequest'
+      responses:
+        '201':
+          description: Session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+    get:
+      tags:
+        - Sessions
+      summary: List recent sessions
+      operationId: listSessions
+      parameters:
+        - $ref: '#/components/parameters/PageCursor'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Paginated session collection
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionCollection'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /sessions/{sessionId}:
+    parameters:
+      - $ref: '#/components/parameters/SessionId'
+    get:
+      tags:
+        - Sessions
+      summary: Fetch a session by identifier
+      operationId: getSession
+      responses:
+        '200':
+          description: Session payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+    patch:
+      tags:
+        - Sessions
+      summary: Update session lifecycle metadata
+      operationId: updateSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionUpdateRequest'
+      responses:
+        '200':
+          description: Session updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /sessions/{sessionId}/checkpoints:
+    parameters:
+      - $ref: '#/components/parameters/SessionId'
+    post:
+      tags:
+        - Attempts
+      summary: Record a phase checkpoint outcome
+      operationId: recordCheckpoint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckpointSubmission'
+      responses:
+        '201':
+          description: Checkpoint persisted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Checkpoint'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /sessions/{sessionId}/attempts:
+    parameters:
+      - $ref: '#/components/parameters/SessionId'
+    post:
+      tags:
+        - Attempts
+      summary: Log an item attempt within a session
+      operationId: createAttempt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttemptSubmission'
+      responses:
+        '201':
+          description: Attempt recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attempt'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+    get:
+      tags:
+        - Attempts
+      summary: Retrieve attempts for a session
+      operationId: listAttempts
+      parameters:
+        - $ref: '#/components/parameters/AttemptType'
+      responses:
+        '200':
+          description: Attempts collection
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - attempts
+                properties:
+                  attempts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Attempt'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /patterns:
+    get:
+      tags:
+        - Patterns
+      summary: List pattern definitions available to clients
+      operationId: listPatterns
+      responses:
+        '200':
+          description: Pattern catalog
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - patterns
+                properties:
+                  patterns:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PatternDefinition'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /users/me/pattern-conquests:
+    get:
+      tags:
+        - Patterns
+      summary: Get personalized pattern conquest data
+      operationId: getPatternConquests
+      responses:
+        '200':
+          description: Pattern conquest metrics for the user
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - patterns
+                properties:
+                  patterns:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PatternConquest'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /reviews:
+    get:
+      tags:
+        - Reviews
+      summary: List active review plans
+      operationId: listReviews
+      responses:
+        '200':
+          description: Review plan collection
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - reviews
+                properties:
+                  reviews:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReviewPlan'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+    post:
+      tags:
+        - Reviews
+      summary: Create a personalized review plan
+      operationId: createReview
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewCreateRequest'
+      responses:
+        '201':
+          description: Review plan created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewPlan'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /reviews/{reviewId}:
+    parameters:
+      - $ref: '#/components/parameters/ReviewId'
+    get:
+      tags:
+        - Reviews
+      summary: Retrieve a review plan by identifier
+      operationId: getReview
+      responses:
+        '200':
+          description: Review plan details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewPlan'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+    patch:
+      tags:
+        - Reviews
+      summary: Update review progress and outcomes
+      operationId: updateReview
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewUpdateRequest'
+      responses:
+        '200':
+          description: Review plan updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewPlan'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /notifications/digest:
+    get:
+      tags:
+        - Notifications
+      summary: Retrieve pending notification digest for rendering
+      operationId: getNotificationDigest
+      responses:
+        '200':
+          description: Notification digest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationDigest'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /notifications/{notificationId}/open:
+    parameters:
+      - $ref: '#/components/parameters/NotificationId'
+    post:
+      tags:
+        - Notifications
+      summary: Record notification open and resulting action
+      operationId: openNotification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationOpenRequest'
+      responses:
+        '202':
+          description: Notification open acknowledged
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationOpenResponse'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /streaks/freeze:
+    post:
+      tags:
+        - Notifications
+      summary: Consume a brain token to freeze the streak
+      operationId: createStreakFreeze
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StreakFreezeRequest'
+      responses:
+        '200':
+          description: Streak freeze applied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StreakFreezeResponse'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /telemetry/events:
+    post:
+      tags:
+        - Telemetry
+      summary: Ingest product telemetry events
+      operationId: ingestTelemetryEvents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TelemetryBatch'
+      responses:
+        '202':
+          description: Telemetry batch accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelemetryIngestResponse'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /sync/sessions:
+    post:
+      tags:
+        - Telemetry
+      summary: Upload offline-completed sessions and attempts
+      operationId: syncSessions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OfflineSyncRequest'
+      responses:
+        '200':
+          description: Offline data merged
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfflineSyncResponse'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /live-activities:
+    post:
+      tags:
+        - LiveActivities
+      summary: Register a Live Activity for a session
+      operationId: registerLiveActivity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LiveActivityRegisterRequest'
+      responses:
+        '201':
+          description: Live Activity registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LiveActivity'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /live-activities/{liveActivityId}:
+    parameters:
+      - $ref: '#/components/parameters/LiveActivityId'
+    patch:
+      tags:
+        - LiveActivities
+      summary: Update Live Activity lifecycle state
+      operationId: updateLiveActivity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LiveActivityUpdateRequest'
+      responses:
+        '200':
+          description: Live Activity updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LiveActivity'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+    delete:
+      tags:
+        - LiveActivities
+      summary: Deregister a Live Activity
+      operationId: deleteLiveActivity
+      responses:
+        '204':
+          description: Live Activity deregistered
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+components:
+  parameters:
+    SessionId:
+      name: sessionId
+      in: path
+      required: true
+      description: Unique identifier for the session.
+      schema:
+        type: string
+        format: uuid
+    ReviewId:
+      name: reviewId
+      in: path
+      required: true
+      description: Unique identifier for the review plan.
+      schema:
+        type: string
+        format: uuid
+    NotificationId:
+      name: notificationId
+      in: path
+      required: true
+      description: Unique identifier of the notification record.
+      schema:
+        type: string
+        format: uuid
+    LiveActivityId:
+      name: liveActivityId
+      in: path
+      required: true
+      description: Unique identifier for the Live Activity registration.
+      schema:
+        type: string
+        format: uuid
+    PageCursor:
+      name: cursor
+      in: query
+      required: false
+      description: Opaque pagination cursor provided by a previous result page.
+      schema:
+        type: string
+    PageSize:
+      name: limit
+      in: query
+      required: false
+      description: Number of resources to return per page.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    AttemptType:
+      name: attemptType
+      in: query
+      required: false
+      description: Filter attempts by verdict classification.
+      schema:
+        type: string
+        enum:
+          - all
+          - correct
+          - incorrect
+        default: all
+  responses:
+    UnexpectedError:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  securitySchemes:
+    FirebaseAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Firebase Authentication ID token issued for the current user.
+  schemas:
+    UserProfile:
+      type: object
+      required:
+        - userId
+        - email
+        - displayName
+        - level
+        - provisionalLevel
+        - timezone
+        - locale
+        - preferences
+        - stats
+        - flags
+        - createdAt
+        - updatedAt
+      properties:
+        userId:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        displayName:
+          type: string
+        level:
+          type: integer
+          minimum: 1
+          maximum: 5
+        provisionalLevel:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: Interim level recommendation prior to consolidation with early sessions.
+        timezone:
+          type: string
+          description: IANA timezone identifier.
+        locale:
+          type: string
+          description: BCP 47 language tag.
+        preferences:
+          $ref: '#/components/schemas/UserPreferences'
+        stats:
+          $ref: '#/components/schemas/UserStats'
+        flags:
+          $ref: '#/components/schemas/UserFlags'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    UserPreferences:
+      type: object
+      required:
+        - hapticsEnabled
+        - soundEnabled
+        - pushOptIn
+        - effectMode
+      properties:
+        hapticsEnabled:
+          type: boolean
+        soundEnabled:
+          type: boolean
+        pushOptIn:
+          type: boolean
+        effectMode:
+          type: string
+          enum:
+            - full
+            - reduced
+            - minimal
+        dailyGoalSentences:
+          type: integer
+          minimum: 6
+          maximum: 24
+        dailyGoalMinutes:
+          type: integer
+          minimum: 5
+          maximum: 30
+    UserStats:
+      type: object
+      required:
+        - currentStreak
+        - longestStreak
+        - brainTokens
+        - streakFreezesAvailable
+        - patternConquestCount
+        - sessionsCompletedThisWeek
+        - lastSessionAt
+        - subscriptionStatus
+      properties:
+        currentStreak:
+          type: integer
+          minimum: 0
+        longestStreak:
+          type: integer
+          minimum: 0
+        brainTokens:
+          type: integer
+          minimum: 0
+        streakFreezesAvailable:
+          type: integer
+          minimum: 0
+        patternConquestCount:
+          type: integer
+          minimum: 0
+        sessionsCompletedThisWeek:
+          type: integer
+          minimum: 0
+        lastSessionAt:
+          type: string
+          format: date-time
+          nullable: true
+        subscriptionStatus:
+          type: string
+          enum:
+            - free
+            - trial
+            - premium
+    UserFlags:
+      type: object
+      required:
+        - levelTestCompleted
+        - tutorialCompleted
+        - personalizationReady
+      properties:
+        levelTestCompleted:
+          type: boolean
+        tutorialCompleted:
+          type: boolean
+        personalizationReady:
+          type: boolean
+        dataDeletionScheduled:
+          type: boolean
+          default: false
+        dataExportRequestedAt:
+          type: string
+          format: date-time
+          nullable: true
+    UserProfileUpdate:
+      type: object
+      properties:
+        displayName:
+          type: string
+        timezone:
+          type: string
+        locale:
+          type: string
+        preferences:
+          $ref: '#/components/schemas/UserPreferencesUpdate'
+    UserPreferencesUpdate:
+      type: object
+      properties:
+        hapticsEnabled:
+          type: boolean
+        soundEnabled:
+          type: boolean
+        pushOptIn:
+          type: boolean
+        effectMode:
+          type: string
+          enum:
+            - full
+            - reduced
+            - minimal
+        dailyGoalSentences:
+          type: integer
+          minimum: 6
+          maximum: 24
+        dailyGoalMinutes:
+          type: integer
+          minimum: 5
+          maximum: 30
+    HomeSummary:
+      type: object
+      required:
+        - dailyGoal
+        - progress
+        - streak
+        - brainTokens
+        - patternCards
+        - recommendedActions
+      properties:
+        dailyGoal:
+          type: object
+          required:
+            - sentences
+            - minutes
+            - tier
+          properties:
+            sentences:
+              type: integer
+            minutes:
+              type: integer
+            tier:
+              type: string
+              enum:
+                - basic
+                - intensive
+              description: Goal pacing tier determined by profile (basic 8–12분 / intensive 12–18분).
+        progress:
+          type: object
+          required:
+            - sentencesCompleted
+            - minutesSpent
+            - lastSessionAt
+          properties:
+            sentencesCompleted:
+              type: integer
+            minutesSpent:
+              type: integer
+            lastSessionAt:
+              type: string
+              format: date-time
+              nullable: true
+        streak:
+          type: object
+          required:
+            - current
+            - longest
+            - freezeEligible
+          properties:
+            current:
+              type: integer
+            longest:
+              type: integer
+            freezeEligible:
+              type: boolean
+        brainTokens:
+          type: object
+          required:
+            - available
+            - pending
+          properties:
+            available:
+              type: integer
+            pending:
+              type: integer
+        patternCards:
+          type: array
+          items:
+            $ref: '#/components/schemas/PatternCard'
+        recommendedActions:
+          type: array
+          items:
+            $ref: '#/components/schemas/HomeAction'
+        liveActivity:
+          $ref: '#/components/schemas/LiveActivityInfo'
+    PatternCard:
+      type: object
+      required:
+        - patternId
+        - label
+        - conquestRate
+        - trend
+        - severity
+        - recommendedAction
+      properties:
+        patternId:
+          type: string
+        label:
+          type: string
+        conquestRate:
+          type: number
+          minimum: 0
+          maximum: 1
+        trend:
+          type: string
+          enum:
+            - improving
+            - stable
+            - declining
+        severity:
+          type: integer
+          minimum: 1
+          maximum: 5
+        recommendedAction:
+          $ref: '#/components/schemas/HomeAction'
+        hintRate:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Ratio of attempts using hints within the pattern window.
+        firstTryRate:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Share of items solved correctly on the first attempt.
+    WidgetSnapshot:
+      type: object
+      required:
+        - updatedAt
+        - sentencesRemaining
+        - dailyGoalTier
+        - currentStreak
+        - brainTokens
+        - deeplink
+      properties:
+        updatedAt:
+          type: string
+          format: date-time
+        sentencesRemaining:
+          type: integer
+          minimum: 0
+        dailyGoalTier:
+          type: string
+          enum:
+            - basic
+            - intensive
+        currentStreak:
+          type: integer
+          minimum: 0
+        brainTokens:
+          type: integer
+          minimum: 0
+        nextBrainTokenInDays:
+          type: integer
+          minimum: 0
+          nullable: true
+        deeplink:
+          type: string
+    HomeAction:
+      type: object
+      required:
+        - type
+        - title
+        - deeplink
+      properties:
+        type:
+          type: string
+          enum:
+            - daily-session
+            - review
+            - brain-burst
+            - widget
+            - tutorial
+        title:
+          type: string
+        subtitle:
+          type: string
+          nullable: true
+        deeplink:
+          type: string
+        planRequired:
+          type: string
+          nullable: true
+          enum:
+            - free
+            - pro
+          description: Indicates if the action requires a specific plan tier.
+    LiveActivityInfo:
+      type: object
+      required:
+        - supported
+        - active
+      properties:
+        supported:
+          type: boolean
+          description: Indicates whether the current device is eligible for Live Activity.
+        active:
+          type: boolean
+          description: True when a Live Activity session is currently running.
+        activityId:
+          type: string
+          format: uuid
+          nullable: true
+        lastUpdatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    DataDeletionRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+          description: Optional user-provided context for the deletion request.
+    DataDeletionResponse:
+      type: object
+      required:
+        - requestId
+        - scheduledDeletionAt
+        - status
+      properties:
+        requestId:
+          type: string
+          format: uuid
+        scheduledDeletionAt:
+          type: string
+          format: date-time
+          description: Target timestamp for physical deletion, typically within 30 days.
+        status:
+          type: string
+          enum:
+            - scheduled
+            - in-progress
+            - completed
+    DataExportRequest:
+      type: object
+      properties:
+        deliveryChannel:
+          type: string
+          enum:
+            - email
+            - in-app
+          description: Preferred channel for delivering the export link; defaults to email.
+    DataExportResponse:
+      type: object
+      required:
+        - requestId
+        - estimatedReadyAt
+        - status
+      properties:
+        requestId:
+          type: string
+          format: uuid
+        estimatedReadyAt:
+          type: string
+          format: date-time
+          description: Estimated time when the export archive will be available (≤ 72 hours).
+        status:
+          type: string
+          enum:
+            - processing
+            - ready
+            - delivered
+    TutorialCompletionRequest:
+      type: object
+      required:
+        - tutorialId
+        - completedAt
+      properties:
+        tutorialId:
+          type: string
+          example: onboarding-1
+        completedAt:
+          type: string
+          format: date-time
+        liveActivityId:
+          type: string
+          format: uuid
+          nullable: true
+    TutorialCompletionResponse:
+      type: object
+      required:
+        - tutorialId
+        - streakEligible
+        - personalizationUnlocked
+      properties:
+        tutorialId:
+          type: string
+        streakEligible:
+          type: boolean
+        personalizationUnlocked:
+          type: boolean
+    LevelTestSubmission:
+      type: object
+      required:
+        - attempts
+        - startedAt
+        - completedAt
+      properties:
+        attempts:
+          type: array
+          minItems: 10
+          maxItems: 15
+          items:
+            $ref: '#/components/schemas/LevelTestAttempt'
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+    LevelTestAttempt:
+      type: object
+      required:
+        - itemId
+        - selectedTokenIds
+        - timeSpentMs
+      properties:
+        itemId:
+          type: string
+        selectedTokenIds:
+          type: array
+          items:
+            type: string
+        timeSpentMs:
+          type: integer
+          minimum: 0
+        hintsUsed:
+          type: integer
+          minimum: 0
+          default: 0
+    LevelTestResult:
+      type: object
+      required:
+        - recommendedLevel
+        - confidence
+        - rationale
+        - nextLessonId
+      properties:
+        recommendedLevel:
+          type: integer
+          minimum: 1
+          maximum: 5
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        rationale:
+          type: string
+        nextLessonId:
+          type: string
+        unlocksReview:
+          type: boolean
+          default: false
+        needsSessionCalibration:
+          type: boolean
+          description: True when early session performance will be combined before finalizing the level.
+          default: true
+    SessionCreateRequest:
+      type: object
+      required:
+        - mode
+        - entryPoint
+      properties:
+        mode:
+          type: string
+          enum:
+            - daily
+            - review
+            - brain-burst
+            - tutorial
+            - diagnostic
+        entryPoint:
+          type: string
+          description: Client surface that started the session.
+          example: home.cta
+        patternFocus:
+          type: array
+          items:
+            type: string
+        includeAudio:
+          type: boolean
+          default: true
+        seedSessionId:
+          type: string
+          nullable: true
+    Session:
+      type: object
+      required:
+        - sessionId
+        - mode
+        - status
+        - startedAt
+        - expiresAt
+        - phases
+        - items
+      properties:
+        sessionId:
+          type: string
+          format: uuid
+        mode:
+          type: string
+        status:
+          type: string
+          enum:
+            - pending
+            - active
+            - completed
+            - abandoned
+        startedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        source:
+          type: string
+          enum:
+            - online
+            - offline
+        phases:
+          type: array
+          items:
+            $ref: '#/components/schemas/SessionPhase'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SessionItem'
+        summary:
+          $ref: '#/components/schemas/SessionSummary'
+        liveActivity:
+          $ref: '#/components/schemas/LiveActivity'
+    SessionCollection:
+      type: object
+      required:
+        - sessions
+        - nextCursor
+      properties:
+        sessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Session'
+        nextCursor:
+          type: string
+          nullable: true
+    SessionPhase:
+      type: object
+      required:
+        - phaseId
+        - label
+        - phaseType
+        - order
+        - targetSentences
+        - targetDurationSeconds
+        - itemIds
+        - comboRules
+      properties:
+        phaseId:
+          type: string
+        label:
+          type: string
+        phaseType:
+          type: string
+          enum:
+            - warm-up
+            - focus
+            - cool-down
+            - review
+            - challenge
+        order:
+          type: integer
+        targetSentences:
+          type: integer
+        targetDurationSeconds:
+          type: integer
+        itemIds:
+          type: array
+          items:
+            type: string
+        comboRules:
+          type: object
+          required:
+            - base
+            - bonusPerStreak
+          properties:
+            base:
+              type: integer
+            bonusPerStreak:
+              type: integer
+        checkpointStatus:
+          $ref: '#/components/schemas/CheckpointStatus'
+        hintBudget:
+          type: integer
+          minimum: 0
+          description: Maximum hints allocated for this phase.
+    LiveActivity:
+      type: object
+      required:
+        - liveActivityId
+        - sessionId
+        - status
+        - activityToken
+        - createdAt
+        - updatedAt
+      properties:
+        liveActivityId:
+          type: string
+          format: uuid
+        sessionId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+            - preparing
+            - active
+            - ended
+            - expired
+        activityToken:
+          type: string
+          description: Encrypted token provided by ActivityKit for push updates.
+        pushTokenExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    LiveActivityRegisterRequest:
+      type: object
+      required:
+        - sessionId
+        - activityToken
+        - pushToken
+      properties:
+        sessionId:
+          type: string
+          format: uuid
+        activityToken:
+          type: string
+          description: ActivityKit token used for direct updates.
+        pushToken:
+          type: string
+          description: APNs token used for Live Activity updates.
+        deviceCapabilities:
+          type: object
+          properties:
+            supportsLiveActivities:
+              type: boolean
+            supportsDynamicIsland:
+              type: boolean
+    LiveActivityUpdateRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum:
+            - active
+            - ended
+            - expired
+        summary:
+          $ref: '#/components/schemas/SessionSummary'
+    CheckpointStatus:
+      type: object
+      required:
+        - reached
+      properties:
+        reached:
+          type: boolean
+        accuracy:
+          type: number
+          minimum: 0
+          maximum: 1
+          nullable: true
+        combosMax:
+          type: integer
+          nullable: true
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+    SessionItem:
+      type: object
+      required:
+        - itemId
+        - prompt
+        - frame
+        - tokens
+        - correctSequence
+        - patternTags
+        - difficultyBand
+      properties:
+        itemId:
+          type: string
+        prompt:
+          $ref: '#/components/schemas/ItemPrompt'
+        frame:
+          $ref: '#/components/schemas/ItemFrame'
+        tokens:
+          type: array
+          items:
+            $ref: '#/components/schemas/FrameToken'
+        distractors:
+          type: array
+          items:
+            $ref: '#/components/schemas/FrameToken'
+        correctSequence:
+          type: array
+          items:
+            type: string
+        patternTags:
+          type: array
+          items:
+            type: string
+        difficultyBand:
+          type: string
+          enum:
+            - intro
+            - core
+            - challenge
+        hints:
+          type: array
+          items:
+            $ref: '#/components/schemas/Hint'
+        scoring:
+          $ref: '#/components/schemas/ScoringRules'
+    ItemPrompt:
+      type: object
+      required:
+        - ko
+        - enReference
+      properties:
+        ko:
+          type: string
+        enReference:
+          type: string
+        audioUrl:
+          type: string
+          format: uri
+          nullable: true
+    ItemFrame:
+      type: object
+      required:
+        - slots
+      properties:
+        slots:
+          type: array
+          items:
+            $ref: '#/components/schemas/FrameSlot'
+    FrameSlot:
+      type: object
+      required:
+        - role
+        - label
+        - optional
+      properties:
+        role:
+          type: string
+          enum:
+            - S
+            - V
+            - O
+            - M
+        label:
+          type: string
+        optional:
+          type: boolean
+    FrameToken:
+      type: object
+      required:
+        - tokenId
+        - display
+        - role
+      properties:
+        tokenId:
+          type: string
+        display:
+          type: string
+        role:
+          type: string
+          enum:
+            - S
+            - V
+            - O
+            - M
+        lemma:
+          type: string
+        audioUrl:
+          type: string
+          format: uri
+          nullable: true
+    Hint:
+      type: object
+      required:
+        - order
+        - type
+        - content
+      properties:
+        order:
+          type: integer
+        type:
+          type: string
+          enum:
+            - text
+            - slot-label
+            - highlight
+            - reveal
+        content:
+          type: string
+    ScoringRules:
+      type: object
+      required:
+        - basePoints
+        - comboBonus
+        - hintPenalty
+      properties:
+        basePoints:
+          type: integer
+        comboBonus:
+          type: integer
+        hintPenalty:
+          type: integer
+    SessionSummary:
+      type: object
+      required:
+        - accuracy
+        - totalItems
+        - correct
+        - incorrect
+        - hintsUsed
+        - comboMax
+        - brainTokensEarned
+        - durationSeconds
+        - patternImpact
+      properties:
+        accuracy:
+          type: number
+          minimum: 0
+          maximum: 1
+        totalItems:
+          type: integer
+        correct:
+          type: integer
+        incorrect:
+          type: integer
+        hintsUsed:
+          type: integer
+        comboMax:
+          type: integer
+        brainTokensEarned:
+          type: integer
+        durationSeconds:
+          type: integer
+        patternImpact:
+          type: array
+          items:
+            $ref: '#/components/schemas/PatternImpact'
+        hintRate:
+          type: number
+          minimum: 0
+          maximum: 1
+        firstTryRate:
+          type: number
+          minimum: 0
+          maximum: 1
+        completedAt:
+          type: string
+          format: date-time
+    SessionUpdateRequest:
+      type: object
+      required:
+        - status
+        - summary
+      properties:
+        status:
+          type: string
+          enum:
+            - completed
+            - abandoned
+        summary:
+          $ref: '#/components/schemas/SessionSummary'
+    CheckpointSubmission:
+      type: object
+      required:
+        - checkpointId
+        - phaseId
+        - reachedAt
+        - accuracy
+        - comboMax
+        - hintsUsed
+        - durationSeconds
+      properties:
+        checkpointId:
+          type: string
+        phaseId:
+          type: string
+        reachedAt:
+          type: string
+          format: date-time
+        accuracy:
+          type: number
+          minimum: 0
+          maximum: 1
+        comboMax:
+          type: integer
+        hintsUsed:
+          type: integer
+        durationSeconds:
+          type: integer
+        brainTokensEarned:
+          type: integer
+          minimum: 0
+        freezeConsumed:
+          type: boolean
+    Checkpoint:
+      allOf:
+        - $ref: '#/components/schemas/CheckpointSubmission'
+        - type: object
+          required:
+            - sessionId
+          properties:
+            sessionId:
+              type: string
+    AttemptSubmission:
+      type: object
+      required:
+        - attemptId
+        - itemId
+        - startedAt
+        - completedAt
+        - placements
+        - verdict
+        - timeSpentMs
+        - hintsUsed
+        - comboCount
+      properties:
+        attemptId:
+          type: string
+        itemId:
+          type: string
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        placements:
+          type: array
+          items:
+            $ref: '#/components/schemas/Placement'
+        verdict:
+          type: string
+          enum:
+            - correct
+            - incorrect
+            - corrected
+        timeSpentMs:
+          type: integer
+          minimum: 0
+        hintsUsed:
+          type: integer
+          minimum: 0
+        comboCount:
+          type: integer
+          minimum: 0
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttemptError'
+        retryNumber:
+          type: integer
+          minimum: 0
+        firstTryCorrect:
+          type: boolean
+          description: Indicates whether the first placement sequence was correct without retries.
+    Attempt:
+      allOf:
+        - $ref: '#/components/schemas/AttemptSubmission'
+        - type: object
+          required:
+            - sessionId
+          properties:
+            sessionId:
+              type: string
+    Placement:
+      type: object
+      required:
+        - slot
+        - tokenId
+      properties:
+        slot:
+          type: string
+          enum:
+            - S
+            - V
+            - O
+            - M
+        tokenId:
+          type: string
+    AttemptError:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          enum:
+            - missing-verb
+            - missing-object
+            - misplaced-modifier
+            - tense-mismatch
+            - article-error
+            - preposition-error
+            - auxiliary-error
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties:
+            type: string
+    PatternImpact:
+      type: object
+      required:
+        - patternId
+        - deltaConquestRate
+        - exposures
+      properties:
+        patternId:
+          type: string
+        deltaConquestRate:
+          type: number
+        exposures:
+          type: integer
+        severityBefore:
+          type: integer
+          nullable: true
+        severityAfter:
+          type: integer
+          nullable: true
+        hintRateBefore:
+          type: number
+          nullable: true
+        hintRateAfter:
+          type: number
+          nullable: true
+    PatternDefinition:
+      type: object
+      required:
+        - patternId
+        - label
+        - description
+        - focus
+      properties:
+        patternId:
+          type: string
+        label:
+          type: string
+        description:
+          type: string
+        focus:
+          type: string
+          enum:
+            - time-adverb
+            - frequency-adverb
+            - article
+            - preposition
+            - auxiliary
+            - tense
+            - clause
+        example:
+          type: string
+    PatternConquest:
+      type: object
+      required:
+        - patternId
+        - label
+        - conquestRate
+        - severity
+        - exposures
+        - lastPracticedAt
+        - trend
+      properties:
+        patternId:
+          type: string
+        label:
+          type: string
+        conquestRate:
+          type: number
+          minimum: 0
+          maximum: 1
+        severity:
+          type: integer
+          minimum: 1
+          maximum: 5
+        exposures:
+          type: integer
+        lastPracticedAt:
+          type: string
+          format: date-time
+          nullable: true
+        trend:
+          type: string
+          enum:
+            - improving
+            - stable
+            - declining
+        hintRate:
+          type: number
+          minimum: 0
+          maximum: 1
+        firstTryRate:
+          type: number
+          minimum: 0
+          maximum: 1
+    ReviewCreateRequest:
+      type: object
+      required:
+        - trigger
+      properties:
+        trigger:
+          type: string
+          enum:
+            - auto
+            - user
+            - notification
+        patternId:
+          type: string
+          nullable: true
+        targetSentences:
+          type: integer
+          default: 6
+    ReviewPlan:
+      type: object
+      required:
+        - reviewId
+        - patternId
+        - status
+        - scheduledAt
+        - dueAt
+        - items
+      properties:
+        reviewId:
+          type: string
+          format: uuid
+        patternId:
+          type: string
+        status:
+          type: string
+          enum:
+            - pending
+            - in-progress
+            - completed
+            - expired
+        scheduledAt:
+          type: string
+          format: date-time
+        dueAt:
+          type: string
+          format: date-time
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReviewItem'
+        summary:
+          $ref: '#/components/schemas/ReviewSummary'
+    ReviewItem:
+      type: object
+      required:
+        - itemId
+        - prompt
+        - patternTags
+      properties:
+        itemId:
+          type: string
+        prompt:
+          $ref: '#/components/schemas/ItemPrompt'
+        patternTags:
+          type: array
+          items:
+            type: string
+    ReviewSummary:
+      type: object
+      required:
+        - accuracy
+        - durationSeconds
+        - completedAt
+      properties:
+        accuracy:
+          type: number
+          minimum: 0
+          maximum: 1
+        durationSeconds:
+          type: integer
+        completedAt:
+          type: string
+          format: date-time
+        patternImpact:
+          type: array
+          items:
+            $ref: '#/components/schemas/PatternImpact'
+    ReviewUpdateRequest:
+      type: object
+      required:
+        - status
+        - accuracy
+        - durationSeconds
+        - completedAt
+      properties:
+        status:
+          type: string
+          enum:
+            - in-progress
+            - completed
+            - expired
+        accuracy:
+          type: number
+          minimum: 0
+          maximum: 1
+        durationSeconds:
+          type: integer
+        completedAt:
+          type: string
+          format: date-time
+        patternImpact:
+          type: array
+          items:
+            $ref: '#/components/schemas/PatternImpact'
+    NotificationDigest:
+      type: object
+      required:
+        - pending
+      properties:
+        pending:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
+    Notification:
+      type: object
+      required:
+        - notificationId
+        - category
+        - title
+        - body
+        - deliveryAt
+        - deeplink
+        - status
+      properties:
+        notificationId:
+          type: string
+          format: uuid
+        category:
+          type: string
+          enum:
+            - streak
+            - pattern
+            - reminder
+            - promo
+        title:
+          type: string
+        body:
+          type: string
+        deliveryAt:
+          type: string
+          format: date-time
+        deeplink:
+          type: string
+        status:
+          type: string
+          enum:
+            - scheduled
+            - sent
+            - opened
+            - ignored
+        templateId:
+          type: string
+        context:
+          type: object
+          additionalProperties:
+            type: string
+    NotificationOpenRequest:
+      type: object
+      required:
+        - openedAt
+      properties:
+        openedAt:
+          type: string
+          format: date-time
+        surface:
+          type: string
+          enum:
+            - push
+            - in-app
+            - widget
+        actionTaken:
+          type: string
+          enum:
+            - session
+            - review
+            - brain-burst
+            - dismiss
+            - unknown
+    NotificationOpenResponse:
+      type: object
+      required:
+        - notificationId
+        - status
+      properties:
+        notificationId:
+          type: string
+        status:
+          type: string
+          enum:
+            - acknowledged
+            - already-processed
+    StreakFreezeRequest:
+      type: object
+      required:
+        - targetDate
+      properties:
+        targetDate:
+          type: string
+          format: date
+        reason:
+          type: string
+          enum:
+            - travel
+            - illness
+            - workload
+            - other
+        consumeTokenId:
+          type: string
+          nullable: true
+    StreakFreezeResponse:
+      type: object
+      required:
+        - targetDate
+        - streakPreserved
+        - brainTokensRemaining
+      properties:
+        targetDate:
+          type: string
+          format: date
+        streakPreserved:
+          type: boolean
+        brainTokensRemaining:
+          type: integer
+        freezeExpiresAt:
+          type: string
+          format: date-time
+    TelemetryBatch:
+      type: object
+      required:
+        - events
+      properties:
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/TelemetryEvent'
+        source:
+          type: string
+          enum:
+            - client
+            - offline-sync
+    TelemetryEvent:
+      type: object
+      required:
+        - eventId
+        - type
+        - occurredAt
+        - attributes
+      properties:
+        eventId:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum:
+            - session_start
+            - session_complete
+            - item_result
+            - checkpoint_reached
+            - hint_used
+            - notification_sent
+            - notification_opened
+            - review_started
+            - review_completed
+            - live_activity_started
+            - live_activity_ended
+            - deep_action
+        occurredAt:
+          type: string
+          format: date-time
+        sessionId:
+          type: string
+          nullable: true
+        reviewId:
+          type: string
+          nullable: true
+        liveActivityId:
+          type: string
+          nullable: true
+        attributes:
+          type: object
+          additionalProperties:
+            oneOf:
+              - type: string
+              - type: number
+              - type: boolean
+    TelemetryIngestResponse:
+      type: object
+      required:
+        - accepted
+        - rejected
+      properties:
+        accepted:
+          type: integer
+        rejected:
+          type: integer
+        rejectionReasons:
+          type: array
+          items:
+            type: string
+    OfflineSyncRequest:
+      type: object
+      required:
+        - sessions
+        - attempts
+      properties:
+        sessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Session'
+        attempts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Attempt'
+        checkpoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/Checkpoint'
+        pendingRewards:
+          type: array
+          items:
+            $ref: '#/components/schemas/PendingReward'
+    OfflineSyncResponse:
+      type: object
+      required:
+        - mergedSessions
+        - conflicts
+      properties:
+        mergedSessions:
+          type: array
+          items:
+            type: string
+        conflicts:
+          type: array
+          items:
+            $ref: '#/components/schemas/SyncConflict'
+        pendingRewards:
+          type: array
+          items:
+            $ref: '#/components/schemas/PendingReward'
+    SyncConflict:
+      type: object
+      required:
+        - resourceId
+        - resourceType
+        - reason
+      properties:
+        resourceId:
+          type: string
+        resourceType:
+          type: string
+          enum:
+            - session
+            - attempt
+            - checkpoint
+        reason:
+          type: string
+          enum:
+            - duplicate
+            - stale
+            - validation_error
+        serverVersion:
+          type: object
+          additionalProperties: true
+        clientVersion:
+          type: object
+          additionalProperties: true
+    PendingReward:
+      type: object
+      required:
+        - rewardId
+        - type
+        - status
+      properties:
+        rewardId:
+          type: string
+        type:
+          type: string
+          enum:
+            - streak
+            - brain-token
+            - streak-freeze
+            - bonus
+        status:
+          type: string
+          enum:
+            - queued
+            - granted
+        serverClockSnapshot:
+          type: string
+          format: date-time
+          nullable: true
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        status:
+          type: integer
+        details:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
