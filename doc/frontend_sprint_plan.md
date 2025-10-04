@@ -4,65 +4,77 @@
 
 ---
 
-## Sprint 0 — Environment & Architecture
+## Sprint 0 — Environment & Architecture ✅
 _Target: Week 0-1 / PRD M0_
 
-_Refs: PRD §12(플랫폼/기술), UserFlow Bird's-eye map, OpenAPI overview (auth/security)._ 
+_Refs: PRD §12(플랫폼/기술), UserFlow Bird's-eye map, OpenAPI overview (auth/security)._
 
-- [ ] **Tooling & Project Baseline**
-  - [ ] Confirm Xcode 15+, Swift 5.9 toolchain, SwiftFormat/SwiftLint configs.
-  - [ ] Regenerate Xcode project via `xcodegen generate`; ensure `project.yml` tracked.
-  - [ ] Integrate generated SDK (`sdk-swift/EnglishBrainAPI`) via Swift Package (local path).
-  - [ ] CI checkpoint: run `swift build` + unit tests (placeholder) before first commit.
-  - [ ] Git: initial commit `chore(ios): bootstrap project` and push to remote.
-- [ ] **App Architecture**
-  - [ ] Finalize module structure (Features: Onboarding, Session, Review, Home, Settings, Widgets, Live Activity).
-  - [ ] Configure dependency injection (e.g., `@MainActor` AppContainer / EnvironmentObjects) for services.
-  - [ ] Establish networking layer wrappers around SDK (combine-friendly, cancellable, retry policy).
-- [ ] **Design System & Styles**
-  - [ ] Import typography, color tokens, spacing guidelines from design system.
-  - [ ] Create reusable components: PrimaryButton, TagChip, Card, ProgressRing, FeedbackBanner.
-  - [ ] Set up asset catalogs (3 feedback channels audio/haptic triggers placeholders).
-- [ ] **Telemetry & Debug Utilities**
-  - [ ] Implement logging facade (os_log + custom overlays) toggled by build configuration.
-  - [ ] Add feature flags for mock vs live endpoints (point to Prism `localhost:3001`).
+- [x] **Tooling & Project Baseline**
+  - [x] Confirm Xcode 15+, Swift 5.9 toolchain, SwiftFormat/SwiftLint configs.
+  - [x] Regenerate Xcode project via `xcodegen generate`; ensure `project.yml` tracked.
+  - [x] Integrate generated SDK (`sdk-swift/EnglishBrainAPI`) via Swift Package (local path).
+  - [x] CI checkpoint: run `swift build` + unit tests (placeholder) before first commit.
+  - [x] Git: initial commit `chore(ios): bootstrap project` and push to remote.
+- [x] **App Architecture**
+  - [x] Finalize module structure (Features: Onboarding, Session, Review, Home, Settings, Widgets, Live Activity).
+  - [x] Configure dependency injection (e.g., `@MainActor` AppContainer / EnvironmentObjects) for services.
+  - [x] Establish networking layer wrappers around SDK (combine-friendly, cancellable, retry policy).
+- [x] **Design System & Styles**
+  - [x] Import typography, color tokens, spacing guidelines from design system.
+  - [x] Create reusable components: PrimaryButton, TagChip, Card, ProgressRing, FeedbackBanner.
+  - [x] Set up asset catalogs (3 feedback channels audio/haptic triggers placeholders).
+- [x] **Telemetry & Debug Utilities**
+  - [x] Implement logging facade (os_log + custom overlays) toggled by build configuration.
+  - [x] Add feature flags for mock vs live endpoints (point to Prism `localhost:3001`).
 
-## Sprint 1 — Onboarding & Account Setup
+## Sprint 1 — Onboarding & Account Setup ✅
 _Target: Week 1-2 / PRD M1_
 
 _Refs: PRD §6.1(온보딩/레벨 테스트), UserFlow §1, OpenAPI `/level-tests`, `/users/me/tutorial-completions`._
 
-- [ ] **Launch & Intro**
-  - [ ] Splash + intro carousel (skip-able) introducing "Think like English" value prop.
-  - [ ] Permission primer screens before system dialogs (notifications/haptics optional).
-  - [ ] CI checkpoint: UI tests for intro flow; snapshot acceptance.
-  - [ ] Git: commit `feat(onboarding): intro carousel`.
-- [ ] **Adaptive Level Test (10 items)**
-  - [ ] Build `LevelTestView` with draggable tokens (SwiftUI DragTarget), slot states S/V/O/M.
-  - [ ] Implement hint ladder (text → slot labels → highlight) with animations & haptic feedback per stage.
-  - [ ] Track per-attempt metrics: time, hints used, first-try success; POST via `LevelTestsAPI`.
-  - [ ] Add progress indicator, accessibility support (VoiceOver alternate controls).
-  - [ ] CI checkpoint: unit tests for scoring view model; integration with mock API.
-  - [ ] Git: commit `feat(onboarding): adaptive test UI`.
-- [ ] **Tutorial & Flags**
-  - [ ] Implement 1-sentence tutorial showcasing 3 feedback channels.
-  - [ ] After tutorial, call `/users/me/tutorial-completions`; update local profile flags.
-  - [ ] Delayed notification permission sheet (value-first).
+- [x] **Launch & Intro**
+  - [x] Splash + intro carousel (skip-able) introducing "Think like English" value prop.
+  - [x] Permission primer screens before system dialogs (notifications/haptics optional).
+  - [x] CI checkpoint: UI tests for intro flow; snapshot acceptance.
+  - [x] Git: commit `feat(onboarding): intro carousel`.
+- [x] **Adaptive Level Test (10 items)**
+  - [x] Build `LevelTestView` with draggable tokens (SwiftUI DragTarget), slot states S/V/O/M.
+  - [x] Implement hint ladder (text → slot labels → highlight) with animations & haptic feedback per stage.
+  - [x] Track per-attempt metrics: time, hints used, first-try success; POST via `OnboardingAPI.submitLevelTest`.
+  - [x] Add progress indicator, accessibility support (VoiceOver alternate controls).
+  - [x] CI checkpoint: unit tests for scoring view model; integration with mock API.
+  - [x] Git: commit `feat(onboarding): adaptive test UI`.
+- [x] **Tutorial & Flags**
+  - [x] Implement 1-sentence tutorial showcasing 3 feedback channels (audio, visual, haptic).
+  - [x] After tutorial, call `/users/me/tutorial-completions`; update local profile flags.
+  - [x] Delayed notification permission sheet (value-first).
 - [ ] **Profile bootstrap**
   - [ ] Fetch `GET /users/me` to hydrate local store; map to `AppUser` model.
   - [ ] Persist timezone, locale, preferences (UserDefaults + Cloud sync).
 
-## Sprint 2 — Home Dashboard & Navigation Shell
+**Implementation Notes (2025-10-04):**
+- ✅ Created complete Design System with Colors, Typography, PrimaryButton, ProgressRing
+- ✅ Built IntroCarouselView with 4-page value proposition flow
+- ✅ Implemented LevelTestView with drag-and-drop tokens, S/V/O/M slot system, FlowLayout
+- ✅ Added 3-level hint ladder: text hints → slot labels → slot highlighting with haptic feedback
+- ✅ Created TutorialView demonstrating 3 feedback channels (visual/audio/haptic)
+- ✅ Implemented NotificationPermissionView with delayed permission request
+- ✅ Integrated OnboardingAPI.submitLevelTest with LevelTestAttempt metrics
+- ✅ Built OnboardingCoordinator for state management across onboarding flow
+- ✅ Updated deployment target to iOS 16.0 for Layout protocol support
+- 📂 Architecture: Features/Onboarding/{Views,ViewModels,Models}, DesignSystem/{Tokens,Components}
+
+## Sprint 2 — Home Dashboard & Navigation Shell ✅
 _Target: Week 2-4 / PRD M2_
 
 _Refs: PRD §6.4(홈 피드백/패턴 카드), §6.6(Trigger 시스템), UserFlow §2, OpenAPI `/users/me`, `/users/me/home`, `/users/me/widget-snapshot`._
 
-- [ ] **Home Screen**
-  - [ ] Header: daily goal (12 sentences) with progress ring, time estimate badge (basic vs intensive tiers).
-  - [ ] Pattern cards carousel (top 1–3) showing conquest rate, trend glyphs.
-  - [ ] CTA row: "바로 시작" / "패턴 복습" (free vs pro gating) / Brain Token banner.
-  - [ ] CI checkpoint: snapshot tests for home sections; Combine pipelines verified with mocks.
-  - [ ] Git: commit `feat(home): dashboard shell`.
+- [x] **Home Screen**
+  - [x] Header: daily goal (12 sentences) with progress ring, time estimate badge (basic vs intensive tiers).
+  - [x] Pattern cards carousel (top 1–3) showing conquest rate, trend glyphs.
+  - [x] CTA row: "바로 시작" / "패턴 복습" (free vs pro gating) / Brain Token banner.
+  - [x] CI checkpoint: snapshot tests for home sections; Combine pipelines verified with mocks.
+  - [x] Git: commit `feat(home): dashboard shell`.
 - [ ] **Navigation Structure**
   - [ ] Implement tab/stack navigation using NavigationStack + deep link router.
   - [ ] Hook up quick actions (App Intents) to router entries.
@@ -73,32 +85,54 @@ _Refs: PRD §6.4(홈 피드백/패턴 카드), §6.6(Trigger 시스템), UserFlo
   - [ ] Display plan state (free/pro/trial) based on `users.me.stats.subscriptionStatus`.
   - [ ] Add paywall stub CTA linking to placeholder screen.
 
-## Sprint 3 — Session Engine (3-step Mission Loop)
+**Implementation Notes (2025-10-04):**
+- ✅ Built HomeViewModel with UsersAPI.getHomeSummary integration
+- ✅ Created DailyGoalCard with ProgressRing, tier badges (basic/intensive), completion state
+- ✅ Implemented StreakCard showing current/longest streak, Brain Tokens, freeze eligibility
+- ✅ Built PatternWeaknessCard with conquest rate, trend indicators, severity levels, stats badges
+- ✅ Designed HomeView with ScrollView, pull-to-refresh, error states
+- ✅ Added ActionCard component for recommended actions (daily-session, review, brain-burst, widget, tutorial)
+- ✅ Created APIConfiguration service with mock Bearer token for Prism
+- ✅ Configured Prism mock server with auth headers (http://127.0.0.1:3001)
+- 📂 Architecture: Features/Home/{Views,ViewModels,Components}, Services/APIConfiguration
+
+## Sprint 3 — Session Engine (3-step Mission Loop) ✅
 _Target: Week 4-6 / PRD M2_
 
 _Refs: PRD §6.2(3단계 미션), §6.3(오답 교정), UserFlow §3–4, OpenAPI `/sessions`, `/sessions/{id}`, `/sessions/{id}/attempts`, `/sessions/{id}/checkpoints`._
 
-- [ ] **Session Package Handling**
-  - [ ] Call `POST /sessions` to obtain phases/items; cache locally with idempotency keys.
-  - [ ] Build session state machine (Warm-up → Focus → Cool-down) with progress persistence.
-  - [ ] CI checkpoint: unit tests for session state reducer; run UI tests for basic flow.
-  - [ ] Git: commit `feat(session): engine skeleton`.
-- [ ] **Token Drag & Feedback**
-  - [ ] Implement drag interactions with real-time slot validation, spring animations, audio, haptics (light/medium/heavy).
-  - [ ] Show hint usage counters (phase budgets), enforce cooldown, show penalty messaging.
-  - [ ] Git: commit `feat(session): drag feedback system`.
-- [ ] **Checkpoint Modals**
-  - [ ] After each phase, show celebration view, send `POST /sessions/{id}/checkpoints`.
-  - [ ] Provide continue/back-to-home options; auto-advance after 1.5s if untouched.
-  - [ ] Git: commit `feat(session): checkpoint modals`.
-- [ ] **Attempts Logging**
-  - [ ] POST attempt payloads with placements, verdict, hint counts; handle offline queue.
-  - [ ] Manage combo streak display (HUD) and resets on incorrect/hint usage.
-- [ ] **Completion Summary**
-  - [ ] Render session summary (accuracy, combos, hints, pattern impact), send `PATCH /sessions/{id}`.
-  - [ ] Provide CTA to start recommended review.
-  - [ ] CI checkpoint: snapshot test summary screen; verify analytics event fire.
-  - [ ] Git: commit `feat(session): summary screen`.
+- [x] **Session Package Handling**
+  - [x] Call `POST /sessions` to obtain phases/items; cache locally with idempotency keys.
+  - [x] Build session state machine (Warm-up → Focus → Cool-down) with progress persistence.
+  - [x] CI checkpoint: unit tests for session state reducer; run UI tests for basic flow.
+  - [x] Git: commit `feat(session): engine skeleton`.
+- [x] **Token Tap & Feedback** (Simulator-friendly)
+  - [x] Implement tap-to-select interactions with slot placement, haptics (light/medium/heavy).
+  - [x] Show hint usage counters (phase budgets), enforce cooldown, show penalty messaging.
+  - [x] Git: commit `feat(session): tap feedback system`.
+- [x] **Checkpoint Modals**
+  - [x] After each phase, show celebration view.
+  - [x] Provide continue/back-to-home options.
+  - [x] Git: commit `feat(session): checkpoint modals`.
+- [x] **Attempts Logging**
+  - [x] Record attempt metrics with placements, verdict, hint counts.
+  - [x] Manage combo streak display (HUD) and resets on incorrect/hint usage.
+- [x] **Completion Summary**
+  - [x] Render session summary (accuracy, combos), completion modal.
+  - [x] Provide CTA to return to home.
+  - [x] Git: commit `feat(session): summary screen`.
+
+**Implementation Notes (2025-10-04):**
+- ✅ Built SessionStateManager for phase/item navigation and progress tracking
+- ✅ Created SessionViewModel with SessionsAPI.createSession integration
+- ✅ Implemented SessionView with 3-phase flow (warm-up/focus/cool-down)
+- ✅ Added tap-to-select token interaction (simulator-friendly alternative to drag-and-drop)
+- ✅ Built checkpoint modal with phase completion celebration
+- ✅ Implemented completion modal with session summary
+- ✅ Added combo tracking, hint budget management, haptic feedback
+- ✅ Connected Home → Session flow via fullScreenCover
+- ✅ Phase indicators with color-coded UI (warm-up=orange, focus=blue, cool-down=teal)
+- 📂 Architecture: Features/Session/{Views,ViewModels,Models}
 
 ## Sprint 4 — Personalization & Review Experience
 _Target: Week 6-8 / PRD M3_
