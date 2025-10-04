@@ -23,6 +23,9 @@ class LevelTestViewModel: ObservableObject {
     @Published var showFeedback = false
     @Published var isCorrect = false
 
+    // Store completed attempts per item
+    private var completedAttempts: [ItemAttemptData] = []
+
     var currentItem: LevelTestItem? {
         guard items.indices.contains(currentItemIndex) else { return nil }
         return items[currentItemIndex]
@@ -152,6 +155,17 @@ class LevelTestViewModel: ObservableObject {
 
     func nextItem() {
         showFeedback = false
+
+        // Save current item's attempt data before moving to next
+        if let item = currentItem, let metrics = attemptMetrics.last {
+            let selectedTokenIds = slots.compactMap { $0.token?.id }
+            completedAttempts.append(ItemAttemptData(
+                itemId: item.id,
+                selectedTokenIds: selectedTokenIds,
+                metrics: metrics
+            ))
+        }
+
         currentItemIndex += 1
 
         if let nextItem = currentItem {
@@ -173,30 +187,28 @@ class LevelTestViewModel: ObservableObject {
     func submitResults() {
         isLoading = true
 
-        guard let firstMetrics = attemptMetrics.first,
-              let lastMetrics = attemptMetrics.last else {
+        guard let firstAttempt = completedAttempts.first,
+              let lastAttempt = completedAttempts.last else {
             isLoading = false
             return
         }
 
-        // Prepare attempts data according to API spec
-        let attempts: [LevelTestAttempt] = attemptMetrics.enumerated().map { index, metrics in
-            let item = items[index]
-            let selectedTokenIds = slots.compactMap { $0.token?.id }
-            let timeSpentMs = Int(metrics.duration * 1000)
+        // Prepare attempts data using stored per-item data
+        let attempts: [LevelTestAttempt] = completedAttempts.map { attemptData in
+            let timeSpentMs = Int(attemptData.metrics.duration * 1000)
 
             return LevelTestAttempt(
-                itemId: item.id,
-                selectedTokenIds: selectedTokenIds,
+                itemId: attemptData.itemId,
+                selectedTokenIds: attemptData.selectedTokenIds,
                 timeSpentMs: timeSpentMs,
-                hintsUsed: metrics.hintsUsed
+                hintsUsed: attemptData.metrics.hintsUsed
             )
         }
 
         let submission = LevelTestSubmission(
             attempts: attempts,
-            startedAt: firstMetrics.startTime,
-            completedAt: lastMetrics.endTime ?? Date()
+            startedAt: firstAttempt.metrics.startTime,
+            completedAt: lastAttempt.metrics.endTime ?? Date()
         )
 
         // Real API call using OnboardingAPI
@@ -217,5 +229,13 @@ class LevelTestViewModel: ObservableObject {
                 }
             }
         }
+    }
+
+    // MARK: - Helper Structures
+
+    struct ItemAttemptData {
+        let itemId: String
+        let selectedTokenIds: [String]
+        let metrics: AttemptMetrics
     }
 }

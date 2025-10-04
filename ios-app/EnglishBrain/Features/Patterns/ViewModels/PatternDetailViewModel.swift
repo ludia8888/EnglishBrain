@@ -63,7 +63,7 @@ class PatternDetailViewModel: ObservableObject {
     var improvingPatterns: [PatternConquest] {
         conquests
             .filter { $0.trend == .improving }
-            .sorted { $0.conquestRate < $1.conquestRate }
+            .sorted { $0.conquestRate > $1.conquestRate } // Higher conquest rate first = more improved
     }
 
     var averageConquestRate: Double {

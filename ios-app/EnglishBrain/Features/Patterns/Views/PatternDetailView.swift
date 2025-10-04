@@ -9,7 +9,6 @@ import SwiftUI
 import EnglishBrainAPI
 
 struct PatternDetailView: View {
-    @StateObject private var viewModel = PatternDetailViewModel()
     @State private var showReview = false
     let pattern: PatternConquest
 
