@@ -6,18 +6,25 @@
 //
 
 import SwiftUI
-import EnglishBrainAPI
 
 @main
 struct EnglishBrainApp: App {
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+
     init() {
-        // Configure API base path
-        EnglishBrainAPIAPI.basePath = "http://localhost:3001"
+        // Configure API
+        APIConfiguration.shared.configure()
     }
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            if hasCompletedOnboarding {
+                ContentView()
+            } else {
+                OnboardingCoordinator {
+                    hasCompletedOnboarding = true
+                }
+            }
         }
     }
 }
