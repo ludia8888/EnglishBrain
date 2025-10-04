@@ -17,6 +17,8 @@ class SessionViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var showCheckpoint = false
     @Published var showCompletion = false
+    @Published var showBrainBurst = false
+    @Published var brainBurst: BrainBurstState?
 
     // Slot management
     @Published var slots: [SlotItem] = []
@@ -56,6 +58,14 @@ class SessionViewModel: ObservableObject {
                     print("✅ Session created: \(session.sessionId)")
                     print("Phases: \(session.phases.count)")
                     print("Items: \(session.items.count)")
+
+                    // Check for Brain Burst activation
+                    if let burst = session.brainBurst, burst.active {
+                        self?.brainBurst = burst
+                        self?.showBrainBurst = true
+                        print("🧠⚡ Brain Burst activated! Multiplier: \(burst.multiplier)x")
+                    }
+
                     self?.stateManager.loadSession(session)
                     self?.loadCurrentItem()
                 }

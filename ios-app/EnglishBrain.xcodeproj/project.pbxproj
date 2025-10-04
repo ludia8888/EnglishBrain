@@ -21,6 +21,7 @@
 		671CB7ECEA685F3DF5DB9FFF /* PatternDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B674FB779EAE45E3F38D1F4B /* PatternDetailViewModel.swift */; };
 		67FF42C7F5EE3C9B707549B9 /* NotificationPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD83D35DAFF91896A2CC845D /* NotificationPermissionView.swift */; };
 		686468396C836BD7B81A546A /* EnglishBrainApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97902E6E54D0C0B03A3D5911 /* EnglishBrainApp.swift */; };
+		6ACDABCE278C57481D965384 /* BrainBurstAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22538C3AC64927C79E6807E7 /* BrainBurstAnimationView.swift */; };
 		81EAF4B0E2C4939A4812C923 /* IntroCarouselView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A0F092ECFA0C062FB007043 /* IntroCarouselView.swift */; };
 		85C8D394614D441BDBD9F84F /* BrainTokenInventoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D682894F8A70589D8AD6132C /* BrainTokenInventoryView.swift */; };
 		87E9AF7CB86E0D5DE80E45F6 /* StreakCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA92B67F8C36991720F8B6A /* StreakCard.swift */; };
@@ -46,6 +47,7 @@
 /* Begin PBXFileReference section */
 		16D3FF4AE5A6647BE22AB927 /* PrimaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryButton.swift; sourceTree = "<group>"; };
 		18E2EAB6685BB52DE05CA5C0 /* SessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionView.swift; sourceTree = "<group>"; };
+		22538C3AC64927C79E6807E7 /* BrainBurstAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrainBurstAnimationView.swift; sourceTree = "<group>"; };
 		235DDF5E87055116345665DA /* StreakViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakViewModel.swift; sourceTree = "<group>"; };
 		27CFE2D7545B281AAF8F50B3 /* LevelTestState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelTestState.swift; sourceTree = "<group>"; };
 		373AC0A8277782D77C6851AD /* EnglishBrain.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = EnglishBrain.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -148,6 +150,7 @@
 			isa = PBXGroup;
 			children = (
 				18E2EAB6685BB52DE05CA5C0 /* SessionView.swift */,
+				ABBD58230D35A2B96DEA9650 /* Components */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -307,6 +310,14 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		ABBD58230D35A2B96DEA9650 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				22538C3AC64927C79E6807E7 /* BrainBurstAnimationView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
 		ADAE4852F5D551F5FEC9091E /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
@@ -454,6 +465,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9E55C40039A80B18130771B4 /* APIConfiguration.swift in Sources */,
+				6ACDABCE278C57481D965384 /* BrainBurstAnimationView.swift in Sources */,
 				85C8D394614D441BDBD9F84F /* BrainTokenInventoryView.swift in Sources */,
 				E75715246B6669A49759AEBF /* Colors.swift in Sources */,
 				8C66AD869A96465CC1E31601 /* ContentView.swift in Sources */,

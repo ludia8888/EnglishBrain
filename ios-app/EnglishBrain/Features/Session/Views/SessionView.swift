@@ -34,6 +34,11 @@ struct SessionView: View {
             if viewModel.showCompletion {
                 completionModal
             }
+
+            // Brain Burst animation
+            if viewModel.showBrainBurst {
+                brainBurstOverlay
+            }
         }
         .onAppear {
             viewModel.startSession()
@@ -73,6 +78,26 @@ struct SessionView: View {
                 // Phase indicator
                 if let phase = viewModel.stateManager.currentPhase {
                     phaseIndicator(phase)
+                }
+
+                Spacer()
+
+                // Brain Burst indicator
+                if let burst = viewModel.brainBurst, burst.active {
+                    HStack(spacing: 4) {
+                        Image(systemName: "brain.head.profile")
+                            .font(.system(size: 14))
+                        Text("×\(String(format: "%.1f", burst.multiplier))")
+                            .font(.ebLabel)
+                            .fontWeight(.bold)
+                    }
+                    .foregroundColor(.yellow)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(
+                        Capsule()
+                            .fill(Color.yellow.opacity(0.2))
+                    )
                 }
 
                 Spacer()
@@ -349,6 +374,51 @@ struct SessionView: View {
             }
         }
         .padding()
+    }
+
+    // MARK: - Brain Burst Overlay
+
+    private var brainBurstOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.8)
+                .ignoresSafeArea()
+
+            VStack(spacing: 24) {
+                if let burst = viewModel.brainBurst {
+                    BrainBurstAnimationView(multiplier: burst.multiplier)
+                        .frame(height: 300)
+
+                    VStack(spacing: 12) {
+                        Text("Brain Burst 발동!")
+                            .font(.system(size: 36, weight: .black))
+                            .foregroundColor(.white)
+
+                        Text("모든 점수가 \(String(format: "%.1f", burst.multiplier))배로 증가합니다")
+                            .font(.ebH4)
+                            .foregroundColor(.white.opacity(0.9))
+
+                        if let sessionsUntil = burst.sessionsUntilActivation, sessionsUntil > 0 {
+                            Text("다음 활성화까지 \(sessionsUntil)회 세션")
+                                .font(.ebBody)
+                                .foregroundColor(.white.opacity(0.7))
+                                .padding(.top, 8)
+                        }
+                    }
+
+                    PrimaryButton(
+                        title: "시작하기",
+                        action: {
+                            withAnimation {
+                                viewModel.showBrainBurst = false
+                            }
+                        }
+                    )
+                    .padding(.horizontal, 32)
+                    .padding(.top, 16)
+                }
+            }
+        }
+        .transition(.opacity)
     }
 
     // MARK: - Helpers
