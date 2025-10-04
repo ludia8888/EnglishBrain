@@ -1,5 +1,6 @@
 {
   "projects": {
+    "default": "englishbrain-f43f0",
     "development": "englishbrain-dev",
     "staging": "englishbrain-staging",
     "production": "englishbrain-prod"

@@ -1,5 +1,7 @@
 import * as functions from 'firebase-functions';
 
-export const healthcheck = functions.https.onRequest((req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
+import app from './http/app';
+import { handleAuthUserCreate } from './triggers/auth';
+
+export const api = functions.https.onRequest(app);
+export const authOnboardUser = functions.auth.user().onCreate(handleAuthUserCreate);
