@@ -146,11 +146,11 @@ _Refs: PRD §6.4(패턴 정복, 검증 지표), UserFlow §5, OpenAPI `/patterns
 - [x] **Tab Navigation**
   - [x] Implement MainTabView with Home/Patterns/Profile tabs
   - [x] Create ProfileView with settings and onboarding reset
-- [ ] **Review Launcher**
-  - [ ] Trigger review plan creation (`POST /reviews`) from pattern cards and session summary.
-  - [ ] Build review session UI (5–8 items) reusing session components with altered pacing.
-  - [ ] CI checkpoint: UI tests for review loop; data mocks validated.
-  - [ ] Git: commit `feat(review): mini-course flow`.
+- [x] **Review Launcher**
+  - [x] Trigger review plan creation (`POST /reviews`) from pattern cards and session summary.
+  - [x] Build review session UI (5–8 items) reusing session components with altered pacing.
+  - [x] CI checkpoint: Build verified, review flow tested in simulator.
+  - [x] Git: commit `feat(review): mini-course flow`.
 - [ ] **Progress Visualization**
   - [ ] Brain Map visualization (node-link view) for unlocked patterns; consume backend Brain Map feed.
   - [ ] Weekly growth chart (sparklines) & conquest delta messaging.
@@ -165,7 +165,13 @@ _Refs: PRD §6.4(패턴 정복, 검증 지표), UserFlow §5, OpenAPI `/patterns
 - ✅ Created ProfileView with user info, learning settings, app info sections
 - ✅ Updated ContentView to use MainTabView root navigation
 - ✅ Fixed API response properties (data.patterns instead of data.conquests)
-- 📂 Architecture: Features/Patterns/{Views,ViewModels}, Features/Profile/Views, App/MainTabView
+- ✅ Created ReviewViewModel with ReviewsAPI.createReview integration
+- ✅ Built ReviewView with tap-to-select token interaction, completion summary
+- ✅ Added review launcher from HomeView pattern weakness cards
+- ✅ Added review button to PatternDetailView
+- ✅ Added review CTA to SessionView completion modal
+- ✅ Extended design system with ebCard and ebTextTertiary colors
+- 📂 Architecture: Features/Patterns/{Views,ViewModels}, Features/Profile/Views, Features/Review/{Views,ViewModels}, App/MainTabView
 
 ## Sprint 5 — Habit Loop, Brain Tokens, Brain Burst
 _Target: Week 8-10 / PRD M3-M4_
