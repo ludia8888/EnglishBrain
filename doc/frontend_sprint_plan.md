@@ -57,6 +57,8 @@ _Refs: PRD §6.1(온보딩/레벨 테스트), UserFlow §1, OpenAPI `/level-test
 - ✅ Built IntroCarouselView with 4-page value proposition flow
 - ✅ Implemented LevelTestView with drag-and-drop tokens, S/V/O/M slot system, FlowLayout
 - ✅ Added 3-level hint ladder: text hints → slot labels → slot highlighting with haptic feedback
+- ✅ **[FIXED]** LevelTestViewModel now stores per-item attempts data before navigation
+- ✅ **[FIXED]** Submission logic uses stored ItemAttemptData instead of final slot state
 - ✅ Created TutorialView demonstrating 3 feedback channels (visual/audio/haptic)
 - ✅ Implemented NotificationPermissionView with delayed permission request
 - ✅ Integrated OnboardingAPI.submitLevelTest with LevelTestAttempt metrics
@@ -158,6 +160,8 @@ _Refs: PRD §6.4(패턴 정복, 검증 지표), UserFlow §5, OpenAPI `/patterns
 
 **Implementation Notes (2025-10-04):**
 - ✅ Built PatternDetailViewModel with PatternsAPI.getPatternConquests integration
+- ✅ **[FIXED]** Removed unused @StateObject from PatternDetailView (only displays passed data)
+- ✅ **[FIXED]** Improving patterns now sorted descending by conquest rate (better UX)
 - ✅ Created PatternDetailView with conquest rate visualization, stats cards, metrics grid
 - ✅ Implemented PatternsListView categorizing patterns as weak/improving/mastered
 - ✅ Added data collection state handling for new users
