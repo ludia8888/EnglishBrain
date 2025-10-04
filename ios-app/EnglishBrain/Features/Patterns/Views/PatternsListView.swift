@@ -42,7 +42,7 @@ struct PatternsListView: View {
 
     private var contentView: some View {
         ScrollView {
-            VStack(spacing: 24) {
+            LazyVStack(spacing: 24, pinnedViews: []) {
                 // Summary Stats
                 summaryStatsView
 

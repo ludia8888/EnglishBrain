@@ -56,6 +56,34 @@ struct LevelTestView: View {
                 ProgressView()
                     .scaleEffect(1.5)
             }
+
+            // Error overlay
+            if let errorMessage = viewModel.errorMessage {
+                Color.black.opacity(0.5)
+                    .ignoresSafeArea()
+
+                VStack(spacing: 24) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 60))
+                        .foregroundColor(.ebError)
+
+                    Text("오류")
+                        .font(.ebH3)
+                        .foregroundColor(.white)
+
+                    Text(errorMessage)
+                        .font(.ebBody)
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 32)
+
+                    PrimaryButton(title: "확인", action: {
+                        viewModel.errorMessage = nil
+                    })
+                    .frame(width: 200)
+                }
+                .padding(32)
+            }
         }
         .onAppear {
             // Connect onComplete callback to viewModel
@@ -297,24 +325,27 @@ struct TokenView: View {
 
 // MARK: - Drag & Drop Delegate
 
-struct SlotDropDelegate: DropDelegate {
+class SlotDropDelegate: DropDelegate {
     let slotIndex: Int
-    let viewModel: LevelTestViewModel
+    weak var viewModel: LevelTestViewModel?
+
+    init(slotIndex: Int, viewModel: LevelTestViewModel) {
+        self.slotIndex = slotIndex
+        self.viewModel = viewModel
+    }
 
     func performDrop(info: DropInfo) -> Bool {
         guard let itemProvider = info.itemProviders(for: [.text]).first else { return false }
 
-        itemProvider.loadItem(forTypeIdentifier: "public.text", options: nil) { [weak viewModel] data, error in
+        itemProvider.loadItem(forTypeIdentifier: "public.text", options: nil) { [weak viewModel, slotIndex = self.slotIndex] data, error in
             guard let data = data as? Data,
-                  let tokenId = String(data: data, encoding: .utf8) else {
+                  let tokenId = String(data: data, encoding: .utf8),
+                  let viewModel = viewModel,
+                  let token = viewModel.availableTokens.first(where: { $0.id == tokenId }) else {
                 return
             }
 
             Task { @MainActor in
-                guard let viewModel = viewModel,
-                      let token = viewModel.availableTokens.first(where: { $0.id == tokenId }) else {
-                    return
-                }
                 viewModel.placeToken(token, in: slotIndex)
             }
         }

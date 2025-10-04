@@ -25,6 +25,10 @@ class SessionViewModel: ObservableObject {
     @Published var availableTokens: [TokenDragItem] = []
     @Published var selectedTokenId: String?
 
+    // Haptic generators (reusable for better performance)
+    private let impactGenerator = UIImpactFeedbackGenerator(style: .medium)
+    private let notificationGenerator = UINotificationFeedbackGenerator()
+
     private var cancellables = Set<AnyCancellable>()
 
     struct SlotItem: Identifiable {
@@ -76,6 +80,10 @@ class SessionViewModel: ObservableObject {
     private func loadCurrentItem() {
         guard let item = stateManager.currentItem else { return }
 
+        // Prepare haptic generators for upcoming interactions
+        impactGenerator.prepare()
+        notificationGenerator.prepare()
+
         // Initialize slots based on frame
         let frameSlots = item.frame.slots.enumerated().map { (index, slot) in
             (index: index, slot: slot)
@@ -126,8 +134,7 @@ class SessionViewModel: ObservableObject {
         selectedTokenId = nil
 
         // Haptic feedback
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
+        impactGenerator.impactOccurred()
 
         checkCompletion()
     }
@@ -141,8 +148,7 @@ class SessionViewModel: ObservableObject {
         slots[slotIndex].token = nil
         availableTokens.append(token)
 
-        let generator = UIImpactFeedbackGenerator(style: .soft)
-        generator.impactOccurred()
+        impactGenerator.impactOccurred()
     }
 
     private func checkCompletion() {
@@ -160,8 +166,7 @@ class SessionViewModel: ObservableObject {
         stateManager.recordAttempt(selectedTokenIds: selectedTokenIds, isCorrect: isCorrect)
 
         // Haptic & audio feedback
-        let generator = UINotificationFeedbackGenerator()
-        generator.notificationOccurred(isCorrect ? .success : .error)
+        notificationGenerator.notificationOccurred(isCorrect ? .success : .error)
 
         if isCorrect {
             // Show success, move to next item after delay
@@ -205,8 +210,7 @@ class SessionViewModel: ObservableObject {
             }
         }
 
-        let generator = UINotificationFeedbackGenerator()
-        generator.notificationOccurred(.warning)
+        notificationGenerator.notificationOccurred(.warning)
     }
 
     // MARK: - Navigation

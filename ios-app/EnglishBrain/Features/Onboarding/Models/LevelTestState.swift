@@ -58,7 +58,8 @@ struct AttemptMetrics {
     var hintsUsed: Int
     var hintLevel: HintLevel
     var isFirstTrySuccess: Bool
-    var attemptCount: Int
+    var submissionCount: Int  // Number of times user submitted (filled all slots)
+    var tokenPlacementCount: Int  // Total number of token placements
 
     var duration: TimeInterval {
         guard let end = endTime else { return Date().timeIntervalSince(startTime) }
