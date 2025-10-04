@@ -307,8 +307,20 @@ struct SessionView: View {
                     .font(.ebBodyLarge)
                     .foregroundColor(.white)
 
-                PrimaryButton(title: "홈으로", action: { dismiss() })
-                    .frame(width: 200)
+                VStack(spacing: 12) {
+                    PrimaryButton(title: "홈으로", action: { dismiss() })
+                        .frame(width: 200)
+
+                    Button(action: {
+                        // TODO: Launch review with weak patterns from this session
+                        dismiss()
+                    }) {
+                        Text("약점 패턴 복습하기")
+                            .font(.ebBody)
+                            .foregroundColor(.ebPrimary)
+                            .padding(.vertical, 12)
+                    }
+                }
             }
             .padding(40)
         }

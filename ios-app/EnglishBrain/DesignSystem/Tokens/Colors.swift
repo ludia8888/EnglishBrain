@@ -22,8 +22,10 @@ extension Color {
     // MARK: - Neutral Colors
     static let ebBackground = Color(hex: "F5F7FA")
     static let ebSurface = Color.white
+    static let ebCard = Color.white
     static let ebTextPrimary = Color(hex: "212121")
     static let ebTextSecondary = Color(hex: "757575")
+    static let ebTextTertiary = Color(hex: "9E9E9E")
     static let ebTextDisabled = Color(hex: "BDBDBD")
     static let ebDivider = Color(hex: "E0E0E0")
 

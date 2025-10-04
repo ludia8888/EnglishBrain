@@ -11,6 +11,8 @@ import EnglishBrainAPI
 struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
     @State private var showSession = false
+    @State private var showReview = false
+    @State private var selectedPatternId: String?
 
     var body: some View {
         NavigationView {
@@ -59,7 +61,8 @@ struct HomeView: View {
                                             PatternWeaknessCard(
                                                 pattern: pattern,
                                                 onDrill: { patternId in
-                                                    print("Start drill for pattern: \(patternId)")
+                                                    selectedPatternId = patternId
+                                                    showReview = true
                                                 }
                                             )
                                         }
@@ -116,6 +119,9 @@ struct HomeView: View {
             .navigationBarHidden(true)
             .fullScreenCover(isPresented: $showSession) {
                 SessionView()
+            }
+            .fullScreenCover(isPresented: $showReview) {
+                ReviewView(patternId: selectedPatternId, targetSentences: 6)
             }
         }
     }

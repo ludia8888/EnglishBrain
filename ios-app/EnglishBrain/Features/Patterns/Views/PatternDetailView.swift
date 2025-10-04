@@ -10,6 +10,7 @@ import EnglishBrainAPI
 
 struct PatternDetailView: View {
     @StateObject private var viewModel = PatternDetailViewModel()
+    @State private var showReview = false
     let pattern: PatternConquest
 
     var body: some View {
@@ -17,6 +18,9 @@ struct PatternDetailView: View {
             VStack(spacing: 24) {
                 // Header
                 patternHeaderView
+
+                // Review CTA
+                reviewButtonView
 
                 // Stats Overview
                 statsOverviewView
@@ -37,6 +41,9 @@ struct PatternDetailView: View {
         .background(Color.ebBackground)
         .navigationTitle(pattern.label)
         .navigationBarTitleDisplayMode(.large)
+        .fullScreenCover(isPresented: $showReview) {
+            ReviewView(patternId: pattern.patternId, targetSentences: 6)
+        }
     }
 
     // MARK: - Header
@@ -254,6 +261,15 @@ struct PatternDetailView: View {
         case .stable: return "안정"
         case .declining: return "하락"
         }
+    }
+
+    // MARK: - Review Button
+
+    private var reviewButtonView: some View {
+        PrimaryButton(
+            title: "이 패턴 복습하기",
+            action: { showReview = true }
+        )
     }
 
     private func trendColor(_ trend: PatternConquest.Trend) -> Color {
