@@ -25,6 +25,17 @@ class ReviewViewModel: ObservableObject {
     // Review metrics
     @Published var correctCount = 0
     @Published var totalAttempts = 0
+    private var startTime: Date?
+    private var sessionStartTime: Date?
+
+    // Store per-item results for submission
+    private var itemResults: [ItemResult] = []
+
+    struct ItemResult {
+        let itemId: String
+        let isCorrect: Bool
+        let timeSpent: TimeInterval
+    }
 
     struct TokenDragItem: Identifiable, Equatable {
         let id: String
@@ -75,6 +86,10 @@ class ReviewViewModel: ObservableObject {
                 } else if let plan = response {
                     self?.reviewPlan = plan
                     self?.currentItemIndex = 0
+                    self?.sessionStartTime = Date()
+                    self?.itemResults = []
+                    self?.correctCount = 0
+                    self?.totalAttempts = 0
                     self?.setupCurrentItem()
 
                     print("✅ Created review plan with \(plan.items.count) items")
@@ -87,10 +102,11 @@ class ReviewViewModel: ObservableObject {
     func setupCurrentItem() {
         guard let item = currentItem else { return }
 
-        // Note: ReviewItem doesn't have frame data like SessionItem
-        // We'll need to generate tokens from the prompt for review
-        // For now, create placeholder tokens
-        let words = item.prompt.ko.components(separatedBy: " ")
+        // Note: ReviewItem doesn't have frame/token data like SessionItem
+        // We use the English reference text to create tokens for review
+        // This is a limitation of the current API - ideally the backend would provide
+        // pre-tokenized frame data for reviews as well
+        let words = item.prompt.enReference.components(separatedBy: " ")
         availableTokens = words.enumerated().map { index, word in
             TokenDragItem(id: "token_\(index)", text: word)
         }.shuffled()
@@ -101,6 +117,7 @@ class ReviewViewModel: ObservableObject {
         }
 
         selectedTokenId = nil
+        startTime = Date()
     }
 
     // MARK: - Token Interaction
@@ -146,13 +163,38 @@ class ReviewViewModel: ObservableObject {
             return
         }
 
-        // Simplified scoring for review
-        let isCorrect = true // TODO: Actual validation logic
+        guard let item = currentItem else { return }
+
+        // Validate answer by comparing user's sentence with reference
+        let userAnswer = slots.compactMap { $0.token?.text }.joined(separator: " ")
+        let reference = item.prompt.enReference
+
+        // Simple validation: normalize whitespace and compare
+        let normalizedUser = userAnswer.trimmingCharacters(in: .whitespaces)
+            .lowercased()
+            .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+        let normalizedReference = reference.trimmingCharacters(in: .whitespaces)
+            .lowercased()
+            .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+
+        let isCorrect = normalizedUser == normalizedReference
+
+        // Track metrics
+        let timeSpent = startTime.map { Date().timeIntervalSince($0) } ?? 0
+        itemResults.append(ItemResult(
+            itemId: item.itemId,
+            isCorrect: isCorrect,
+            timeSpent: timeSpent
+        ))
 
         totalAttempts += 1
         if isCorrect {
             correctCount += 1
         }
+
+        print(isCorrect ? "✅ Correct answer" : "❌ Incorrect answer")
+        print("User: \(normalizedUser)")
+        print("Reference: \(normalizedReference)")
 
         // Move to next item
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
@@ -167,7 +209,48 @@ class ReviewViewModel: ObservableObject {
             currentItemIndex += 1
             setupCurrentItem()
         } else {
+            // Review completed - submit results to backend
+            submitReviewResults()
             isCompleted = true
+        }
+    }
+
+    private func submitReviewResults() {
+        guard let plan = reviewPlan else { return }
+
+        let accuracy = totalAttempts > 0 ? Double(correctCount) / Double(totalAttempts) : 0.0
+        let durationSeconds = sessionStartTime.map { Int(Date().timeIntervalSince($0)) } ?? 0
+
+        let request = ReviewUpdateRequest(
+            status: .completed,
+            accuracy: accuracy,
+            durationSeconds: durationSeconds,
+            completedAt: Date(),
+            patternImpact: nil // Backend will calculate this
+        )
+
+        isLoading = true
+
+        ReviewsAPI.updateReview(reviewId: plan.reviewId, reviewUpdateRequest: request) { [weak self] response, error in
+            DispatchQueue.main.async {
+                self?.isLoading = false
+
+                if let error = error {
+                    print("❌ Failed to submit review results: \(error)")
+                    // Don't show error to user - review is still completed locally
+                    // Backend can retry or sync later
+                } else if let updatedPlan = response {
+                    print("✅ Review results submitted successfully")
+                    print("Accuracy: \(accuracy)")
+                    print("Duration: \(durationSeconds)s")
+                    if let summary = updatedPlan.summary {
+                        print("Completed at: \(summary.completedAt)")
+                        if let deltaRate = summary.deltaConquestRate {
+                            print("Delta conquest rate: \(deltaRate)")
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -179,6 +262,9 @@ class ReviewViewModel: ObservableObject {
         selectedTokenId = nil
         correctCount = 0
         totalAttempts = 0
+        itemResults = []
+        startTime = nil
+        sessionStartTime = nil
         isCompleted = false
         errorMessage = nil
     }

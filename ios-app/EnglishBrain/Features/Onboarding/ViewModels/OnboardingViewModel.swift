@@ -56,21 +56,32 @@ class OnboardingViewModel: ObservableObject {
 
     private func completeOnboarding() {
         isLoading = true
+        errorMessage = nil
 
         // Mark tutorial as completed via API
-        // UsersAPI.markTutorialComplete { [weak self] response, error in
-        //     DispatchQueue.main.async {
-        //         self?.isLoading = false
-        //         if error == nil {
-        //             self?.currentStep = .complete
-        //         }
-        //     }
-        // }
+        let request = TutorialCompletionRequest(
+            tutorialId: "onboarding_complete",
+            completedAt: Date(),
+            liveActivityId: nil
+        )
 
-        // Mock completion
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            self?.isLoading = false
-            self?.currentStep = .complete
+        OnboardingAPI.createTutorialCompletion(tutorialCompletionRequest: request) { [weak self] response, error in
+            DispatchQueue.main.async {
+                self?.isLoading = false
+
+                if let error = error {
+                    self?.errorMessage = error.localizedDescription
+                    print("❌ Tutorial completion failed: \(error)")
+                    // Still proceed to complete step for better UX, retry can happen in background
+                    self?.currentStep = .complete
+                } else if let response = response {
+                    print("✅ Tutorial marked as complete")
+                    print("Tutorial ID: \(response.tutorialId)")
+                    print("Streak eligible: \(response.streakEligible)")
+                    print("Personalization unlocked: \(response.personalizationUnlocked)")
+                    self?.currentStep = .complete
+                }
+            }
         }
     }
 }

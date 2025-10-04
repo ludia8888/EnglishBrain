@@ -175,6 +175,12 @@ _Refs: PRD §6.4(패턴 정복, 검증 지표), UserFlow §5, OpenAPI `/patterns
 - ✅ Added review button to PatternDetailView
 - ✅ Added review CTA to SessionView completion modal
 - ✅ Extended design system with ebCard and ebTextTertiary colors
+- ✅ **[FIXED]** ReviewViewModel now uses English reference text instead of Korean for token generation
+- ✅ **[FIXED]** Implemented proper answer validation by comparing user sentence with reference
+- ✅ **[FIXED]** Added result submission via ReviewsAPI.updateReview (PATCH /reviews/{id})
+- ✅ **[FIXED]** Added per-item metrics tracking (time spent, correctness) for accuracy calculation
+- ✅ **[FIXED]** OnboardingViewModel now properly calls TutorialCompletionRequest with tutorialId/completedAt
+- ⚠️ **API Limitation**: ReviewItem doesn't include frame/token data like SessionItem does - using enReference text splitting as workaround
 - 📂 Architecture: Features/Patterns/{Views,ViewModels}, Features/Profile/Views, Features/Review/{Views,ViewModels}, App/MainTabView
 
 ## Sprint 5 — Habit Loop, Brain Tokens, Brain Burst
