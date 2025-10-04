@@ -197,10 +197,10 @@ _Refs: PRD §6.6(스트릭/Brain Token), §6.8 Brain Burst (M4 표), UserFlow §
   - [x] Apply bonus multipliers to scoring visuals; handle cooldown messaging.
   - [x] CI checkpoint: Build verified, animation tested in simulator.
   - [x] Git: commit `feat(session): brain burst UI`.
-- [ ] **Notifications & Deep Links**
-  - [ ] Render notification digest (pattern, streak, encouragement) and map deep links into router.
-  - [ ] Track opens (`POST /notifications/{id}/open`) and optional dismissal reasons.
-  - [ ] Git: commit `feat(habit): notification digest`.
+- [x] **Notifications & Deep Links**
+  - [x] Render notification digest (pattern, streak, encouragement) and map deep links into router.
+  - [x] Track opens (`POST /notifications/{id}/open`) and optional dismissal reasons.
+  - [x] Git: commit `feat(habit): notification digest`.
 - [ ] **Live Activity Integration**
   - [ ] Register Live Activity at session start (`POST /live-activities`); update checkpoints & combos; end gracefully.
   - [ ] Handle ActivityKit push updates & fallback for unsupported devices.
@@ -217,7 +217,14 @@ _Refs: PRD §6.6(스트릭/Brain Token), §6.8 Brain Burst (M4 표), UserFlow §
 - ✅ Added Brain Burst overlay modal with multiplier badge and activation animation
 - ✅ Displayed Brain Burst indicator in session header when active
 - ✅ Implemented cooldown messaging showing sessions until next activation
-- 📂 Architecture: Features/Streak/{Views,ViewModels}, Features/Session/Views/Components
+- ✅ Created NotificationViewModel with NotificationsAPI.getNotificationDigest integration
+- ✅ Built NotificationDigestView with category icons, time-ago display, dismiss functionality
+- ✅ Implemented DeepLinkRouter with destination enum and navigation handling
+- ✅ Added notification tab to MainTabView with deep link integration
+- ✅ Track notification opens via NotificationsAPI.openNotification (POST /notifications/{id}/open)
+- ✅ Support action tracking (session/review/brainBurst/dismiss) and surface (in-app)
+- ⚠️ **Type Conflict**: Used `EnglishBrainAPI.Notification` to avoid conflict with Foundation.Notification
+- 📂 Architecture: Features/Notifications/{Views,ViewModels}, Services/DeepLinkRouter, App/MainTabView
 
 ## Sprint 6 — Widgets, Shortcuts, Paywall
 _Target: Week 9-11 / PRD M4_
