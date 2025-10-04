@@ -2,7 +2,7 @@ name: EnglishBrain
 options:
   bundleIdPrefix: com.englishbrain
   deploymentTarget:
-    iOS: "15.0"
+    iOS: "16.0"
 
 packages:
   EnglishBrainAPI:
@@ -12,7 +12,7 @@ targets:
   EnglishBrain:
     type: application
     platform: iOS
-    deploymentTarget: "15.0"
+    deploymentTarget: "16.0"
     sources:
       - EnglishBrain
     dependencies:
