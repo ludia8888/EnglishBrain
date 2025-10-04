@@ -496,6 +496,42 @@ paths:
                 $ref: '#/components/schemas/NotificationOpenResponse'
         default:
           $ref: '#/components/responses/UnexpectedError'
+  /purchases:
+    post:
+      tags:
+        - Purchases
+      summary: Create or update subscription purchase
+      operationId: createPurchase
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseRequest'
+      responses:
+        '201':
+          description: Purchase recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Purchase'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /purchases/me:
+    get:
+      tags:
+        - Purchases
+      summary: Retrieve current subscription state for user
+      operationId: getOwnPurchase
+      responses:
+        '200':
+          description: Subscription status record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Purchase'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
   /streaks/freeze:
     post:
       tags:
@@ -1282,6 +1318,8 @@ components:
             $ref: '#/components/schemas/SessionItem'
         summary:
           $ref: '#/components/schemas/SessionSummary'
+        brainBurst:
+          $ref: '#/components/schemas/BrainBurstState'
         liveActivity:
           $ref: '#/components/schemas/LiveActivity'
     SessionCollection:
@@ -1625,6 +1663,18 @@ components:
         completedAt:
           type: string
           format: date-time
+        brainBurstApplied:
+          type: boolean
+          description: Indicates whether Brain Burst multiplier was applied to this session summary.
+        brainBurstMultiplier:
+          type: number
+          description: Multiplier applied during active Brain Burst (e.g., 2.0).
+          nullable: true
+        brainBurstEligibleAt:
+          type: string
+          format: date-time
+          description: Next eligibility timestamp for Brain Burst activation.
+          nullable: true
     SessionUpdateRequest:
       type: object
       required:
@@ -1957,6 +2007,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PatternImpact'
+        hintRate:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Ratio of items completed with hints during the review.
+        firstTryRate:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Share of review items solved correctly on first attempt.
+        deltaConquestRate:
+          type: number
+          description: Change in conquest rate resulting from the review.
     ReviewUpdateRequest:
       type: object
       required:
@@ -2246,6 +2309,66 @@ components:
         clientVersion:
           type: object
           additionalProperties: true
+    Purchase:
+      type: object
+      required:
+        - purchaseId
+        - plan
+        - status
+        - updatedAt
+      properties:
+        purchaseId:
+          type: string
+          format: uuid
+        plan:
+          type: string
+          enum:
+            - free
+            - trial
+            - premium
+        status:
+          type: string
+          enum:
+            - active
+            - canceled
+            - expired
+        activeUntil:
+          type: string
+          format: date-time
+          nullable: true
+        updatedAt:
+          type: string
+          format: date-time
+        benefits:
+          type: array
+          items:
+            type: string
+          description: Active plan benefits (e.g., unlimited sessions, full review access).
+    PurchaseRequest:
+      type: object
+      required:
+        - receipt
+        - platform
+      properties:
+        receipt:
+          type: string
+          description: Encoded StoreKit verification token or server-side receipt proof.
+        platform:
+          type: string
+          enum:
+            - ios
+            - web
+        plan:
+          type: string
+          enum:
+            - trial
+            - premium
+        storeTransactionId:
+          type: string
+          nullable: true
+        promoCode:
+          type: string
+          nullable: true
     PendingReward:
       type: object
       required:
@@ -2288,3 +2411,22 @@ components:
           items:
             type: object
             additionalProperties: true
+    BrainBurstState:
+      type: object
+      required:
+        - active
+        - multiplier
+      properties:
+        active:
+          type: boolean
+        multiplier:
+          type: number
+          description: Bonus multiplier applied when Brain Burst is active.
+        eligibleAt:
+          type: string
+          format: date-time
+          nullable: true
+        sessionsUntilActivation:
+          type: integer
+          description: Remaining completed sessions before next activation.
+          minimum: 0

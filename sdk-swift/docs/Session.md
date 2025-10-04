@@ -12,6 +12,7 @@ Name | Type | Description | Notes
 **phases** | [SessionPhase] |  | 
 **items** | [SessionItem] |  | 
 **summary** | [**SessionSummary**](SessionSummary.md) |  | [optional] 
+**brainBurst** | [**BrainBurstState**](BrainBurstState.md) |  | [optional] 
 **liveActivity** | [**LiveActivity**](LiveActivity.md) |  | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -45,6 +45,8 @@ Class | Method | HTTP request | Description
 *PatternsAPI* | [**listPatterns**](docs/PatternsAPI.md#listpatterns) | **GET** /patterns | List pattern definitions available to clients
 *PrivacyAPI* | [**createDataDeletionRequest**](docs/PrivacyAPI.md#createdatadeletionrequest) | **POST** /users/me/data-deletion-requests | Submit a user-initiated data deletion request
 *PrivacyAPI* | [**createDataExportRequest**](docs/PrivacyAPI.md#createdataexportrequest) | **POST** /users/me/data-export-requests | Submit a user-initiated data export request
+*PurchasesAPI* | [**createPurchase**](docs/PurchasesAPI.md#createpurchase) | **POST** /purchases | Create or update subscription purchase
+*PurchasesAPI* | [**getOwnPurchase**](docs/PurchasesAPI.md#getownpurchase) | **GET** /purchases/me | Retrieve current subscription state for user
 *ReviewsAPI* | [**createReview**](docs/ReviewsAPI.md#createreview) | **POST** /reviews | Create a personalized review plan
 *ReviewsAPI* | [**getReview**](docs/ReviewsAPI.md#getreview) | **GET** /reviews/{reviewId} | Retrieve a review plan by identifier
 *ReviewsAPI* | [**listReviews**](docs/ReviewsAPI.md#listreviews) | **GET** /reviews | List active review plans
@@ -66,6 +68,7 @@ Class | Method | HTTP request | Description
  - [Attempt](docs/Attempt.md)
  - [AttemptError](docs/AttemptError.md)
  - [AttemptSubmission](docs/AttemptSubmission.md)
+ - [BrainBurstState](docs/BrainBurstState.md)
  - [Checkpoint](docs/Checkpoint.md)
  - [CheckpointStatus](docs/CheckpointStatus.md)
  - [CheckpointSubmission](docs/CheckpointSubmission.md)
@@ -109,6 +112,8 @@ Class | Method | HTTP request | Description
  - [PatternImpact](docs/PatternImpact.md)
  - [PendingReward](docs/PendingReward.md)
  - [Placement](docs/Placement.md)
+ - [Purchase](docs/Purchase.md)
+ - [PurchaseRequest](docs/PurchaseRequest.md)
  - [ReviewCreateRequest](docs/ReviewCreateRequest.md)
  - [ReviewItem](docs/ReviewItem.md)
  - [ReviewPlan](docs/ReviewPlan.md)

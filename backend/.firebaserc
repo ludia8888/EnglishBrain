@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "development": "englishbrain-dev",
+    "staging": "englishbrain-staging",
+    "production": "englishbrain-prod"
+  }
+}

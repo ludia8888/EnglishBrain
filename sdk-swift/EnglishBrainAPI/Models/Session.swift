@@ -31,9 +31,10 @@ public struct Session: Codable, JSONEncodable, Hashable {
     public var phases: [SessionPhase]
     public var items: [SessionItem]
     public var summary: SessionSummary?
+    public var brainBurst: BrainBurstState?
     public var liveActivity: LiveActivity?
 
-    public init(sessionId: UUID, mode: String, status: Status, startedAt: Date, expiresAt: Date, source: Source? = nil, phases: [SessionPhase], items: [SessionItem], summary: SessionSummary? = nil, liveActivity: LiveActivity? = nil) {
+    public init(sessionId: UUID, mode: String, status: Status, startedAt: Date, expiresAt: Date, source: Source? = nil, phases: [SessionPhase], items: [SessionItem], summary: SessionSummary? = nil, brainBurst: BrainBurstState? = nil, liveActivity: LiveActivity? = nil) {
         self.sessionId = sessionId
         self.mode = mode
         self.status = status
@@ -43,6 +44,7 @@ public struct Session: Codable, JSONEncodable, Hashable {
         self.phases = phases
         self.items = items
         self.summary = summary
+        self.brainBurst = brainBurst
         self.liveActivity = liveActivity
     }
 
@@ -56,6 +58,7 @@ public struct Session: Codable, JSONEncodable, Hashable {
         case phases
         case items
         case summary
+        case brainBurst
         case liveActivity
     }
 
@@ -72,6 +75,7 @@ public struct Session: Codable, JSONEncodable, Hashable {
         try container.encode(phases, forKey: .phases)
         try container.encode(items, forKey: .items)
         try container.encodeIfPresent(summary, forKey: .summary)
+        try container.encodeIfPresent(brainBurst, forKey: .brainBurst)
         try container.encodeIfPresent(liveActivity, forKey: .liveActivity)
     }
 }

@@ -27,8 +27,14 @@ public struct SessionSummary: Codable, JSONEncodable, Hashable {
     public var hintRate: Double?
     public var firstTryRate: Double?
     public var completedAt: Date?
+    /** Indicates whether Brain Burst multiplier was applied to this session summary. */
+    public var brainBurstApplied: Bool?
+    /** Multiplier applied during active Brain Burst (e.g., 2.0). */
+    public var brainBurstMultiplier: Double?
+    /** Next eligibility timestamp for Brain Burst activation. */
+    public var brainBurstEligibleAt: Date?
 
-    public init(accuracy: Double, totalItems: Int, correct: Int, incorrect: Int, hintsUsed: Int, comboMax: Int, brainTokensEarned: Int, durationSeconds: Int, patternImpact: [PatternImpact], hintRate: Double? = nil, firstTryRate: Double? = nil, completedAt: Date? = nil) {
+    public init(accuracy: Double, totalItems: Int, correct: Int, incorrect: Int, hintsUsed: Int, comboMax: Int, brainTokensEarned: Int, durationSeconds: Int, patternImpact: [PatternImpact], hintRate: Double? = nil, firstTryRate: Double? = nil, completedAt: Date? = nil, brainBurstApplied: Bool? = nil, brainBurstMultiplier: Double? = nil, brainBurstEligibleAt: Date? = nil) {
         self.accuracy = accuracy
         self.totalItems = totalItems
         self.correct = correct
@@ -41,6 +47,9 @@ public struct SessionSummary: Codable, JSONEncodable, Hashable {
         self.hintRate = hintRate
         self.firstTryRate = firstTryRate
         self.completedAt = completedAt
+        self.brainBurstApplied = brainBurstApplied
+        self.brainBurstMultiplier = brainBurstMultiplier
+        self.brainBurstEligibleAt = brainBurstEligibleAt
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
@@ -56,6 +65,9 @@ public struct SessionSummary: Codable, JSONEncodable, Hashable {
         case hintRate
         case firstTryRate
         case completedAt
+        case brainBurstApplied
+        case brainBurstMultiplier
+        case brainBurstEligibleAt
     }
 
     // Encodable protocol methods
@@ -74,6 +86,9 @@ public struct SessionSummary: Codable, JSONEncodable, Hashable {
         try container.encodeIfPresent(hintRate, forKey: .hintRate)
         try container.encodeIfPresent(firstTryRate, forKey: .firstTryRate)
         try container.encodeIfPresent(completedAt, forKey: .completedAt)
+        try container.encodeIfPresent(brainBurstApplied, forKey: .brainBurstApplied)
+        try container.encodeIfPresent(brainBurstMultiplier, forKey: .brainBurstMultiplier)
+        try container.encodeIfPresent(brainBurstEligibleAt, forKey: .brainBurstEligibleAt)
     }
 }
 

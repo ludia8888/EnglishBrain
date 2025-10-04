@@ -118,7 +118,7 @@ Update Live Activity lifecycle state
 import EnglishBrainAPI
 
 let liveActivityId = 987 // UUID | Unique identifier for the Live Activity registration.
-let liveActivityUpdateRequest = LiveActivityUpdateRequest(status: "status_example", summary: SessionSummary(accuracy: 123, totalItems: 123, correct: 123, incorrect: 123, hintsUsed: 123, comboMax: 123, brainTokensEarned: 123, durationSeconds: 123, patternImpact: [PatternImpact(patternId: "patternId_example", deltaConquestRate: 123, exposures: 123, severityBefore: 123, severityAfter: 123, hintRateBefore: 123, hintRateAfter: 123)], hintRate: 123, firstTryRate: 123, completedAt: Date())) // LiveActivityUpdateRequest | 
+let liveActivityUpdateRequest = LiveActivityUpdateRequest(status: "status_example", summary: SessionSummary(accuracy: 123, totalItems: 123, correct: 123, incorrect: 123, hintsUsed: 123, comboMax: 123, brainTokensEarned: 123, durationSeconds: 123, patternImpact: [PatternImpact(patternId: "patternId_example", deltaConquestRate: 123, exposures: 123, severityBefore: 123, severityAfter: 123, hintRateBefore: 123, hintRateAfter: 123)], hintRate: 123, firstTryRate: 123, completedAt: Date(), brainBurstApplied: false, brainBurstMultiplier: 123, brainBurstEligibleAt: Date())) // LiveActivityUpdateRequest | 
 
 // Update Live Activity lifecycle state
 LiveActivitiesAPI.updateLiveActivity(liveActivityId: liveActivityId, liveActivityUpdateRequest: liveActivityUpdateRequest) { (response, error) in

@@ -105,7 +105,7 @@ Data
 	•	/sessions/{sessionId} 생성/업데이트
 	•	/attempts/{attemptId} 각 문항 로그
 	•	/users/{uid}/session_checkpoints (Phase 완료 시 기록)
-	•	/liveActivities/{id} 상태 업데이트, session_metrics{firstTryRate, hintRate}
+	•	/liveActivities/{id} 상태 업데이트, session_summary{firstTryRate, hintRate}
 	•	session_start, item_result, session_complete 텔레메트리
 
 Acceptance(KPI 근거)
@@ -160,7 +160,7 @@ Flow
 Data
 	•	/users/{uid}/pattern_conquest 업데이트
 	•	review_start, item_result, review_complete 로깅
-	•	review_metrics: conquestRate(EWMA), hintRate, firstTryRate
+	•	review_summary: conquestRate(EWMA), hintRate, firstTryRate, deltaConquestRate
 
 Design Rationale
 	•	Error-driven 학습 + Spaced Repetition(섹션 6.4, 11.4, 11.5)
@@ -262,6 +262,7 @@ Flow
 
 Data
 	•	paywall_view, trial_start, purchase_success/fail
+	•	/purchases/{uid} 생성/업데이트
 
 Design Rationale
 	•	가치 체험 후 전환(섹션 6.7)
@@ -307,7 +308,7 @@ Flow
 	•	패턴 카드 업데이트, 개인화 메시지·큐 생성
 
 Data
-	•	/users/{uid}/pattern_conquest, /reviews/{reviewId}, /session_metrics/{sessionId}
+	•	/users/{uid}/pattern_conquest, /reviews/{reviewId}, /session_summary/{sessionId}
 	•	pattern_update, recommend_review(Functions), telemetry_event(session_first_try_rate, hint_rate)
 
 Design Rationale

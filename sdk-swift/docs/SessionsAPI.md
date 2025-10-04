@@ -169,7 +169,7 @@ Update session lifecycle metadata
 import EnglishBrainAPI
 
 let sessionId = 987 // UUID | Unique identifier for the session.
-let sessionUpdateRequest = SessionUpdateRequest(status: "status_example", summary: SessionSummary(accuracy: 123, totalItems: 123, correct: 123, incorrect: 123, hintsUsed: 123, comboMax: 123, brainTokensEarned: 123, durationSeconds: 123, patternImpact: [PatternImpact(patternId: "patternId_example", deltaConquestRate: 123, exposures: 123, severityBefore: 123, severityAfter: 123, hintRateBefore: 123, hintRateAfter: 123)], hintRate: 123, firstTryRate: 123, completedAt: Date())) // SessionUpdateRequest | 
+let sessionUpdateRequest = SessionUpdateRequest(status: "status_example", summary: SessionSummary(accuracy: 123, totalItems: 123, correct: 123, incorrect: 123, hintsUsed: 123, comboMax: 123, brainTokensEarned: 123, durationSeconds: 123, patternImpact: [PatternImpact(patternId: "patternId_example", deltaConquestRate: 123, exposures: 123, severityBefore: 123, severityAfter: 123, hintRateBefore: 123, hintRateAfter: 123)], hintRate: 123, firstTryRate: 123, completedAt: Date(), brainBurstApplied: false, brainBurstMultiplier: 123, brainBurstEligibleAt: Date())) // SessionUpdateRequest | 
 
 // Update session lifecycle metadata
 SessionsAPI.updateSession(sessionId: sessionId, sessionUpdateRequest: sessionUpdateRequest) { (response, error) in

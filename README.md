@@ -54,6 +54,12 @@ EnglishBrain/
     └── EnglishBrain/            # App source code
         ├── EnglishBrainApp.swift   # App entry point
         └── ContentView.swift       # Main view with API test UI
+
+backend/                         # Firebase Functions backend
+├── package.json                # Node project manifest (TypeScript)
+├── firebase.json               # Emulator/runtime config
+├── src/                        # Cloud Function sources
+└── README.md                   # Backend setup guide
 ```
 
 ## 🚀 Getting Started
@@ -88,6 +94,15 @@ EnglishBrain/
 4. **Build and run** (Cmd+R)
    - Select a simulator (iPhone 15 recommended)
    - The app will connect to `http://localhost:3001` by default
+
+5. **Backend scaffolding**
+   ```bash
+   cd backend
+   npm install
+   npm run lint && npm run test && npm run build
+   ```
+
+   Use `npm run dev` to launch Firebase emulators after installing the Firebase CLI.
 
 ## 🔧 Development
 
@@ -129,6 +144,38 @@ EnglishBrainAPIAPI.basePath = "http://localhost:3001"  // Change as needed
 - **Staging:** `https://api-staging.englishbrain.com`
 - **Production:** `https://api.englishbrain.com`
 
+### Mock Server (Prism)
+
+Until the real backend is ready, you can serve mock responses directly from the OpenAPI contract using [Stoplight Prism](https://github.com/stoplightio/prism).
+
+> Docker Desktop (or Colima) must be running before executing the command below.
+
+```bash
+docker run --rm \
+  -v "$PWD/doc/openapi.yaml:/openapi.yaml:ro" \
+  -p 3001:4010 \
+  stoplight/prism:5 \
+  mock /openapi.yaml --host 0.0.0.0
+```
+
+This maps Prism's default port (`4010`) to `localhost:3001`, so the app and SDK continue using the same base URL. Once Prism starts, you should see logs for each mocked request in the terminal.
+
+**Optional checks**
+- Visit `http://localhost:3001/users/me` in your browser or with `curl` to verify the mock server is responding.
+- Use `CTRL+C` to stop the container when you're done.
+
+#### Without Docker (Node.js only)
+
+If Docker access is restricted, you can run Prism directly with Node.js:
+
+```bash
+npx @stoplight/prism mock doc/openapi.yaml --port 3001 --host 0.0.0.0
+```
+
+> The `--host 0.0.0.0` flag ensures the mock server listens on all interfaces so the iOS simulator (or other devices) can reach it.
+
+For physical devices, replace the base URL in the app with your Mac's LAN IP (e.g. `http://192.168.x.x:3001`).
+
 ## 📦 SDK Overview
 
 The Swift SDK is automatically generated from the OpenAPI specification and includes:
@@ -165,7 +212,37 @@ The app includes a built-in API test screen:
 2. Tap "Test API Connection" button
 3. View the connection status
 
-**Note:** You need a backend server running on `localhost:3001` for the test to succeed.
+**Note:** You need a backend server running on `127.0.0.1:3001` for the test to succeed.
+
+### Troubleshooting
+
+#### "Connection refused" errors
+
+If you see `Connection refused` errors:
+
+1. **Check if Docker/Colima is running:**
+   ```bash
+   colima status
+   # If broken or stopped, restart:
+   colima delete
+   colima start --cpu 4 --memory 8
+   ```
+
+2. **Verify Prism is running on port 3001:**
+   ```bash
+   curl http://127.0.0.1:3001/users/me/home
+   # Should return a 401 response (auth required)
+   ```
+
+3. **If using `localhost` causes IPv6 connection attempts:**
+   - The app uses `127.0.0.1:3001` to force IPv4 and avoid harmless IPv6 connection logs
+
+#### 401 Unauthorized responses
+
+Mock server returns `401` by default because the OpenAPI spec requires Firebase authentication. This is **expected behavior** for unauthenticated requests. To test without authentication:
+
+- Remove `security` from specific endpoints in `doc/openapi.yaml`, or
+- Add mock authentication headers to your SDK calls
 
 ## 📚 Documentation
 

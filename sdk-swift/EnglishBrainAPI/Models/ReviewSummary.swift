@@ -13,16 +13,27 @@ import AnyCodable
 public struct ReviewSummary: Codable, JSONEncodable, Hashable {
 
     static let accuracyRule = NumericRule<Double>(minimum: 0, exclusiveMinimum: false, maximum: 1, exclusiveMaximum: false, multipleOf: nil)
+    static let hintRateRule = NumericRule<Double>(minimum: 0, exclusiveMinimum: false, maximum: 1, exclusiveMaximum: false, multipleOf: nil)
+    static let firstTryRateRule = NumericRule<Double>(minimum: 0, exclusiveMinimum: false, maximum: 1, exclusiveMaximum: false, multipleOf: nil)
     public var accuracy: Double
     public var durationSeconds: Int
     public var completedAt: Date
     public var patternImpact: [PatternImpact]?
+    /** Ratio of items completed with hints during the review. */
+    public var hintRate: Double?
+    /** Share of review items solved correctly on first attempt. */
+    public var firstTryRate: Double?
+    /** Change in conquest rate resulting from the review. */
+    public var deltaConquestRate: Double?
 
-    public init(accuracy: Double, durationSeconds: Int, completedAt: Date, patternImpact: [PatternImpact]? = nil) {
+    public init(accuracy: Double, durationSeconds: Int, completedAt: Date, patternImpact: [PatternImpact]? = nil, hintRate: Double? = nil, firstTryRate: Double? = nil, deltaConquestRate: Double? = nil) {
         self.accuracy = accuracy
         self.durationSeconds = durationSeconds
         self.completedAt = completedAt
         self.patternImpact = patternImpact
+        self.hintRate = hintRate
+        self.firstTryRate = firstTryRate
+        self.deltaConquestRate = deltaConquestRate
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
@@ -30,6 +41,9 @@ public struct ReviewSummary: Codable, JSONEncodable, Hashable {
         case durationSeconds
         case completedAt
         case patternImpact
+        case hintRate
+        case firstTryRate
+        case deltaConquestRate
     }
 
     // Encodable protocol methods
@@ -40,6 +54,9 @@ public struct ReviewSummary: Codable, JSONEncodable, Hashable {
         try container.encode(durationSeconds, forKey: .durationSeconds)
         try container.encode(completedAt, forKey: .completedAt)
         try container.encodeIfPresent(patternImpact, forKey: .patternImpact)
+        try container.encodeIfPresent(hintRate, forKey: .hintRate)
+        try container.encodeIfPresent(firstTryRate, forKey: .firstTryRate)
+        try container.encodeIfPresent(deltaConquestRate, forKey: .deltaConquestRate)
     }
 }
 
