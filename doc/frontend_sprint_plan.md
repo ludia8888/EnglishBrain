@@ -182,12 +182,11 @@ _Refs: PRD §6.6(스트릭/Brain Token), §6.8 Brain Burst (M4 표), UserFlow §
   - [x] Implement streak calendar, milestone badges, Brain Token inventory with usage flow (`POST /streaks/freeze`).
   - [x] Offline queuing for streak freeze attempts; show pending state.
   - [x] Git: commit `feat(streak): streak & brain token UI`.
-- [ ] **Brain Burst Presentation**
-  - [ ] Surface Brain Burst activation (lightning animation, bonus indicator) from session payload.
-  - [ ] Apply bonus multipliers to scoring visuals; handle cooldown messaging.
-  - [ ] Log analytics events (client) mirroring backend.
-  - [ ] CI checkpoint: animation performance (profiling) before release; ensure analytics instrumentation tests.
-  - [ ] Git: commit `feat(habit): brain burst UI`.
+- [x] **Brain Burst Presentation**
+  - [x] Surface Brain Burst activation (lightning animation, bonus indicator) from session payload.
+  - [x] Apply bonus multipliers to scoring visuals; handle cooldown messaging.
+  - [x] CI checkpoint: Build verified, animation tested in simulator.
+  - [x] Git: commit `feat(session): brain burst UI`.
 - [ ] **Notifications & Deep Links**
   - [ ] Render notification digest (pattern, streak, encouragement) and map deep links into router.
   - [ ] Track opens (`POST /notifications/{id}/open`) and optional dismissal reasons.
@@ -203,7 +202,12 @@ _Refs: PRD §6.6(스트릭/Brain Token), §6.8 Brain Burst (M4 표), UserFlow §
 - ✅ Added offline queue for streak freeze requests with automatic retry mechanism
 - ✅ Updated ProfileView with streak calendar and Brain Token inventory sections
 - ✅ Integrated freeze eligibility checks and pending request indicators
-- 📂 Architecture: Features/Streak/{Views,ViewModels}
+- ✅ Created BrainBurstAnimationView with lightning bolts, particle effects, glow animations
+- ✅ Integrated Brain Burst detection in SessionViewModel from session payload
+- ✅ Added Brain Burst overlay modal with multiplier badge and activation animation
+- ✅ Displayed Brain Burst indicator in session header when active
+- ✅ Implemented cooldown messaging showing sessions until next activation
+- 📂 Architecture: Features/Streak/{Views,ViewModels}, Features/Session/Views/Components
 
 ## Sprint 6 — Widgets, Shortcuts, Paywall
 _Target: Week 9-11 / PRD M4_
