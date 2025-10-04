@@ -29,6 +29,9 @@ class SessionViewModel: ObservableObject {
     private let impactGenerator = UIImpactFeedbackGenerator(style: .medium)
     private let notificationGenerator = UINotificationFeedbackGenerator()
 
+    // WorkItem for cancellable delayed actions (prevents race conditions)
+    private var submitDelayWorkItem: DispatchWorkItem?
+
     private var cancellables = Set<AnyCancellable>()
 
     struct SlotItem: Identifiable {
@@ -41,6 +44,11 @@ class SessionViewModel: ObservableObject {
         let id: String
         let text: String
         let isCorrect: Bool? = nil
+    }
+
+    deinit {
+        // Cancel any pending work to prevent crashes
+        submitDelayWorkItem?.cancel()
     }
 
     // MARK: - Session Lifecycle
@@ -168,17 +176,23 @@ class SessionViewModel: ObservableObject {
         // Haptic & audio feedback
         notificationGenerator.notificationOccurred(isCorrect ? .success : .error)
 
+        // Cancel any pending delayed action to prevent race conditions
+        submitDelayWorkItem?.cancel()
+
         if isCorrect {
             // Show success, move to next item after delay
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            let workItem = DispatchWorkItem { [weak self] in
                 self?.moveToNextItem()
             }
+            submitDelayWorkItem = workItem
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: workItem)
         } else {
             // Show error feedback, allow retry
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-                // Clear slots for retry
+            let workItem = DispatchWorkItem { [weak self] in
                 self?.clearAllSlots()
             }
+            submitDelayWorkItem = workItem
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: workItem)
         }
     }
 

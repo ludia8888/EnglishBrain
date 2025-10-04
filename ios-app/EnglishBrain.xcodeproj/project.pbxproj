@@ -11,6 +11,7 @@
 		0928C5F4B147EA03B20FFD5A /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = B44B7B0E46FA56E450B5818A /* Typography.swift */; };
 		0A3BDD185BDC6C45340CEE82 /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE76D05C8B170EE8EF0997B5 /* OnboardingViewModel.swift */; };
 		26B878F5F5C4AB04648D14A9 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1F16E5B8004CC387D6F306 /* ProfileView.swift */; };
+		2739F4EA115C9AA2535DC184 /* Error+UserFriendly.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F386D0A185861357AF589BD /* Error+UserFriendly.swift */; };
 		364012B645B1C56ABCF9357F /* ProgressRing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F566295879F3FE91ED615FC /* ProgressRing.swift */; };
 		3F4BABF55B799149AE03747C /* SessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E2EAB6685BB52DE05CA5C0 /* SessionView.swift */; };
 		3FC4BD48BB20217E78F2836C /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BB9F372ACFAF98FC5899252 /* MainTabView.swift */; };
@@ -71,6 +72,7 @@
 		8F566295879F3FE91ED615FC /* ProgressRing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressRing.swift; sourceTree = "<group>"; };
 		8FFCCB1528502A866561CDFA /* SessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionViewModel.swift; sourceTree = "<group>"; };
 		97902E6E54D0C0B03A3D5911 /* EnglishBrainApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnglishBrainApp.swift; sourceTree = "<group>"; };
+		9F386D0A185861357AF589BD /* Error+UserFriendly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Error+UserFriendly.swift"; sourceTree = "<group>"; };
 		B44B7B0E46FA56E450B5818A /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
 		B674FB779EAE45E3F38D1F4B /* PatternDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatternDetailViewModel.swift; sourceTree = "<group>"; };
 		B6C097D4B12257B3E07FDEEE /* LevelTestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelTestViewModel.swift; sourceTree = "<group>"; };
@@ -101,6 +103,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		05295CB88E6F3B872B6A5131 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				9F386D0A185861357AF589BD /* Error+UserFriendly.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
 		08EFDB873BEEE69B5C40B0A0 /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -422,6 +432,7 @@
 				A496E0757BBA06B5453C5A34 /* DesignSystem */,
 				3C38C9D685D4A434C12D67A4 /* Features */,
 				C161EA13C6A06DC3DD538AA8 /* Services */,
+				05295CB88E6F3B872B6A5131 /* Utils */,
 			);
 			path = EnglishBrain;
 			sourceTree = "<group>";
@@ -505,6 +516,7 @@
 				E1E1C3BF8FAD217A690E1D6C /* DailyGoalCard.swift in Sources */,
 				F76DBB07808827F28B53B97B /* DeepLinkRouter.swift in Sources */,
 				686468396C836BD7B81A546A /* EnglishBrainApp.swift in Sources */,
+				2739F4EA115C9AA2535DC184 /* Error+UserFriendly.swift in Sources */,
 				BF2BB95C590677BA94645595 /* HomeView.swift in Sources */,
 				F10BCD759EAD5A843B98A95C /* HomeViewModel.swift in Sources */,
 				81EAF4B0E2C4939A4812C923 /* IntroCarouselView.swift in Sources */,

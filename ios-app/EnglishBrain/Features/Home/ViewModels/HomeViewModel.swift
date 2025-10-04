@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Combine
 import EnglishBrainAPI
 
 @MainActor
@@ -14,8 +13,6 @@ class HomeViewModel: ObservableObject {
     @Published var homeSummary: HomeSummary?
     @Published var isLoading = false
     @Published var errorMessage: String?
-
-    private var cancellables = Set<AnyCancellable>()
 
     init() {
         loadHomeSummary()
@@ -30,8 +27,8 @@ class HomeViewModel: ObservableObject {
                 self?.isLoading = false
 
                 if let error = error {
-                    self?.errorMessage = error.localizedDescription
-                    print("❌ Failed to load home summary: \(error)")
+                    self?.errorMessage = error.userFriendlyMessage
+                    print("❌ Failed to load home summary: \(error.detailedDescription)")
                 } else if let summary = response {
                     self?.homeSummary = summary
                     print("✅ Home summary loaded")
