@@ -2,6 +2,7 @@ import http from 'http';
 import { PassThrough } from 'stream';
 
 import * as admin from 'firebase-admin';
+import request from 'supertest';
 
 import app from '../src/http/app';
 import { getFirestore } from '../src/firebaseAdmin';
@@ -131,6 +132,7 @@ if (!EMULATORS_AVAILABLE) {
         lastSessionAt: '2024-01-05T21:00:00.000Z',
       };
 
+      await admin.firestore().recursiveDelete(admin.firestore().collection('analytics_events'));
       await firestore.collection('users').doc(TEST_USER_UID).set(profile);
 
       const auth = admin.auth();
@@ -172,6 +174,7 @@ if (!EMULATORS_AVAILABLE) {
 
     afterEach(async () => {
       await getFirestore().collection('users').doc(TEST_USER_UID).delete();
+      await admin.firestore().recursiveDelete(admin.firestore().collection('analytics_events'));
     });
 
     afterAll(async () => {
@@ -222,6 +225,56 @@ if (!EMULATORS_AVAILABLE) {
       expect(body.currentStreak).toBe(4);
       expect(body.sentencesRemaining).toBeGreaterThanOrEqual(0);
       expect(body.deeplink).toContain('englishbrain://');
+    });
+
+    it('accepts tutorial completion payloads', async () => {
+      const completedAt = new Date().toISOString();
+      const { status, body } = await request(app)
+        .post('/users/me/tutorial-completions')
+        .set('Authorization', `Bearer ${idToken}`)
+        .send({
+          tutorialId: 'onboarding_complete',
+          completedAt,
+        });
+
+      expect(status).toBe(202);
+      expect(body.tutorialId).toBe('onboarding_complete');
+
+      const userDoc = await getFirestore().collection('users').doc(TEST_USER_UID).get();
+      expect(userDoc.data()?.flags?.tutorialCompleted).toBe(true);
+
+      const completionDoc = await getFirestore()
+        .collection('users')
+        .doc(TEST_USER_UID)
+        .collection('tutorial_completions')
+        .doc('onboarding_complete')
+        .get();
+      expect(completionDoc.exists).toBe(true);
+
+      const analyticsDocs = await admin
+        .firestore()
+        .collection('analytics_events')
+        .where('uid', '==', TEST_USER_UID)
+        .where('eventType', '==', 'tutorial_completion')
+        .get();
+
+      expect(analyticsDocs.empty).toBe(false);
+      const event = analyticsDocs.docs[0]?.data() as { payload?: { tutorialId?: string; personalizationUnlocked?: boolean } };
+      expect(event?.payload?.tutorialId).toBe('onboarding_complete');
+      expect(event?.payload?.personalizationUnlocked).toBe(true);
+    });
+
+    it('rejects tutorial completion payloads with invalid timestamps', async () => {
+      const { status, body } = await request(app)
+        .post('/users/me/tutorial-completions')
+        .set('Authorization', `Bearer ${idToken}`)
+        .send({
+          tutorialId: '',
+          completedAt: 'yesterday',
+        });
+
+      expect(status).toBe(400);
+      expect(body.message).toBeDefined();
     });
   });
 }

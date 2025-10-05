@@ -171,5 +171,40 @@ if (!EMULATORS_AVAILABLE) {
     },
       30000
     );
+
+    it('rejects invalid level test payload', async () => {
+      const submission: Partial<LevelTestSubmissionPayload> = {
+        attempts: [],
+        startedAt: 'not-a-date',
+        completedAt: 'also-not-a-date',
+      };
+
+      const { statusCode, body } = await postJson<{ message: string }>('/level-tests', idToken, submission);
+
+      expect(statusCode).toBe(400);
+      expect(body.message).toBeDefined();
+    });
+
+    it('enforces level test rate limit', async () => {
+      const makeSubmission = () => ({
+        attempts: LESSON_IDS.map((lessonId, index) => ({
+          itemId: lessonId,
+          selectedTokenIds: ['token-a', `token-${index}`],
+          timeSpentMs: 12000,
+          hintsUsed: 0,
+        })),
+        startedAt: new Date(Date.now() - 60000).toISOString(),
+        completedAt: new Date().toISOString(),
+      });
+
+      for (let i = 0; i < 2; i += 1) {
+        const { statusCode } = await postJson<LevelTestResult>('/level-tests', idToken, makeSubmission());
+        expect(statusCode).toBe(200);
+      }
+
+      const { statusCode, body } = await postJson<{ message: string }>('/level-tests', idToken, makeSubmission());
+      expect(statusCode).toBe(429);
+      expect(body.message).toContain('limit');
+    });
   });
 }

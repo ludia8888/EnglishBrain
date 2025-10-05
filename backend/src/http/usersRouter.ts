@@ -9,6 +9,8 @@ import {
   getWidgetSnapshot,
   applyTutorialCompletion,
 } from '../services/userService';
+import { ValidationError } from '../utils/errors';
+import { validateTutorialCompletionPayload } from '../validation/tutorialCompletion';
 
 const router = Router();
 
@@ -82,18 +84,16 @@ router.post('/me/tutorial-completions', async (req, res) => {
   if (!uid) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
-  const { tutorialId, completedAt } = req.body ?? {};
-  if (typeof tutorialId !== 'string' || tutorialId.trim().length === 0) {
-    return res.status(400).json({ message: 'tutorialId is required' });
-  }
-  if (typeof completedAt !== 'string' || Number.isNaN(Date.parse(completedAt))) {
-    return res.status(400).json({ message: 'completedAt must be an ISO date-time string' });
-  }
   try {
+    const { tutorialId, completedAt } = validateTutorialCompletionPayload(req.body);
     const resp = await applyTutorialCompletion(uid, tutorialId, completedAt);
     return res.status(202).json(resp);
-  } catch (e) {
-    return res.status(500).json({ message: (e as Error).message });
+  } catch (error) {
+    if (error instanceof ValidationError) {
+      return res.status(error.statusCode).json({ message: error.message });
+    }
+    console.error('Tutorial completion failed', error);
+    return res.status(500).json({ message: 'Failed to mark tutorial completion' });
   }
 });
 

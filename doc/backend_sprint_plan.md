@@ -61,13 +61,19 @@ _Refs: PRD §6.1(온보딩/레벨 테스트), UserFlow §1 (First-Run), OpenAPI 
   - [x] Rules tests: `@firebase/rules-unit-testing` coverage for lessons + level_tests collections.
   - [x] Documentation: README with endpoint spec, request/response examples, side effects.
   - [ ] Git: commit `feat(onboarding): level test submission pipeline`.
-- [ ] **Tutorial Completion & Flags**
-  - [ ] Provide `POST /users/me/tutorial-completions` to toggle tutorial flags, unlock personalization readiness.
-  - [ ] Emit analytics event (BigQuery export or GA) for onboarding funnel.
-  - [ ] Git: commit `feat(onboarding): tutorial completion hook`.
-- [ ] **Validation & Rate Limiting**
-  - [ ] Validate request payloads against OpenAPI schema (zod or ajv).
-  - [ ] Rate limit level test submissions via Firestore counters or Cloud Armor (prevent abuse).
+- [x] **Tutorial Completion & Flags**
+  - [x] Provide `POST /users/me/tutorial-completions` to toggle tutorial flags, unlock personalization readiness.
+  - [x] Emit analytics event (BigQuery export or GA) for onboarding funnel.
+  - [x] Record `tutorial_completion` event with personalization metadata in `analytics_events` collection.
+  - [x] Contract tests verify analytics event creation alongside profile updates.
+  - [ ] **Optional**: Add TTL/retention strategy (Firestore TTL or nightly BigQuery export).
+  - [ ] **Optional**: Add analytics for level test completion and first session start.
+  - [ ] Git: commit `feat(onboarding): validation, rate limiting, and analytics`.
+- [x] **Validation & Rate Limiting**
+  - [x] Validate request payloads against OpenAPI schema (shared validators in `backend/src/validation/`).
+  - [x] Rate limit level test submissions via Firestore counters (max 2 per 24h per user).
+  - [x] Contract tests for validation errors and rate limit enforcement.
+  - [ ] **Optional**: Optimize rate-limit counters with Firestore aggregates or Redis before production launch.
 
 ## Sprint 3 — Sessions, Attempts, Checkpoints
 _Target: Week 4-6 / PRD M2_

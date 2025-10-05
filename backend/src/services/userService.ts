@@ -1,6 +1,8 @@
 import type { DocumentData } from 'firebase-admin/firestore';
 
 import { getFirestore } from '../firebaseAdmin';
+import { LevelTestResult } from '../types/levelTest';
+import { SessionSummary } from '../types/session';
 import {
   HomeAction,
   HomeSummary,
@@ -11,8 +13,8 @@ import {
   UserStats,
   WidgetSnapshot,
 } from '../types/user';
-import { LevelTestResult } from '../types/levelTest';
-import { SessionSummary } from '../types/session';
+
+import { recordAnalyticsEvent } from './analyticsService';
 
 const USERS_COLLECTION = 'users';
 const DEFAULT_LEVEL = 1;
@@ -111,6 +113,12 @@ export async function applyTutorialCompletion(
     .collection('tutorial_completions')
     .doc(tutorialId)
     .set({ tutorialId, completedAt, createdAt: updatedAt });
+
+  await recordAnalyticsEvent(uid, 'tutorial_completion', {
+    tutorialId,
+    completedAt,
+    personalizationUnlocked,
+  });
 
   return { tutorialId, streakEligible: true, personalizationUnlocked };
 }

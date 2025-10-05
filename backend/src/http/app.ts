@@ -1,10 +1,10 @@
 import cors from 'cors';
 import express from 'express';
 
+import levelTestsRouter from './levelTestsRouter';
 import patternsRouter from './patternsRouter';
 import sessionsRouter from './sessionsRouter';
 import usersRouter from './usersRouter';
-import levelTestsRouter from './levelTestsRouter';
 
 const app = express();
 

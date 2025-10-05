@@ -1,16 +1,20 @@
 import { getFirestore } from '../firebaseAdmin';
-import { generateId } from '../utils/id';
 import {
   LevelTestLessonDoc,
   LevelTestSubmissionPayload,
   LevelTestResult,
   LevelTestSubmissionRecord,
-  LevelTestAttemptSubmission,
 } from '../types/levelTest';
+import { ValidationError } from '../utils/errors';
+import { generateId } from '../utils/id';
+import { validateLevelTestPayload } from '../validation/levelTest';
+
 import { applyLevelTestResult, ensureUserProfile } from './userService';
 
 const LESSONS_COLLECTION = 'lessons';
 const LEVEL_TESTS_COLLECTION = 'level_tests';
+const LEVEL_TEST_RATE_LIMIT_WINDOW_MS = 24 * 60 * 60 * 1000; // 24 hours
+const LEVEL_TEST_RATE_LIMIT_MAX_SUBMISSIONS = 2;
 
 interface EvaluationSummary {
   result: LevelTestResult & {
@@ -26,6 +30,7 @@ export async function submitLevelTest(uid: string, payload: LevelTestSubmissionP
   validateLevelTestPayload(payload);
 
   await ensureUserProfile({ uid });
+  await assertLevelTestRateLimit(uid);
 
   const evaluation = await evaluateSubmission(payload);
   const submissionId = generateId('lvltest');
@@ -54,6 +59,31 @@ export async function submitLevelTest(uid: string, payload: LevelTestSubmissionP
   });
 
   return evaluation.result;
+}
+
+async function assertLevelTestRateLimit(uid: string): Promise<void> {
+  const windowStart = Date.now() - LEVEL_TEST_RATE_LIMIT_WINDOW_MS;
+  const db = getFirestore();
+
+  const recentSubmissions = await db
+    .collection(LEVEL_TESTS_COLLECTION)
+    .where('uid', '==', uid)
+    .orderBy('createdAt', 'desc')
+    .limit(LEVEL_TEST_RATE_LIMIT_MAX_SUBMISSIONS)
+    .get();
+
+  const submissionsWithinWindow = recentSubmissions.docs.filter((doc) => {
+    const createdAt = doc.get('createdAt');
+    if (typeof createdAt !== 'string') {
+      return false;
+    }
+    const createdAtMs = Date.parse(createdAt);
+    return !Number.isNaN(createdAtMs) && createdAtMs >= windowStart;
+  });
+
+  if (submissionsWithinWindow.length >= LEVEL_TEST_RATE_LIMIT_MAX_SUBMISSIONS) {
+    throw new ValidationError('Level test submission limit reached. Please try again tomorrow.', 429);
+  }
 }
 
 async function evaluateSubmission(payload: LevelTestSubmissionPayload): Promise<EvaluationSummary> {
@@ -170,27 +200,4 @@ function clampLevel(level: number): number {
     return 1;
   }
   return Math.min(5, Math.max(1, level));
-}
-
-export function validateLevelTestPayload(payload: LevelTestSubmissionPayload) {
-  if (!payload) {
-    throw new Error('Missing submission payload');
-  }
-  if (!Array.isArray(payload.attempts) || payload.attempts.length < 10 || payload.attempts.length > 15) {
-    throw new Error('Level test must include between 10 and 15 attempts');
-  }
-  payload.attempts.forEach((attempt: LevelTestAttemptSubmission, index) => {
-    if (!attempt.itemId) {
-      throw new Error(`Attempt ${index} missing itemId`);
-    }
-    if (!Array.isArray(attempt.selectedTokenIds)) {
-      throw new Error(`Attempt ${index} missing selectedTokenIds`);
-    }
-    if (typeof attempt.timeSpentMs !== 'number' || attempt.timeSpentMs < 0) {
-      throw new Error(`Attempt ${index} has invalid timeSpentMs`);
-    }
-  });
-  if (!payload.startedAt || !payload.completedAt) {
-    throw new Error('Missing startedAt or completedAt timestamp');
-  }
 }
