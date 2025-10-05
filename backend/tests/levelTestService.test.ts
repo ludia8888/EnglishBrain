@@ -1,4 +1,4 @@
-import { validateLevelTestPayload } from '../src/services/levelTestService';
+import { validateLevelTestPayload } from '../src/validation/levelTest';
 
 describe('validateLevelTestPayload', () => {
   const basePayload = {
