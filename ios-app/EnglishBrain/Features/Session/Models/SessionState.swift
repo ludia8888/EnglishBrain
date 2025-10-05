@@ -8,6 +8,118 @@
 import Foundation
 import EnglishBrainAPI
 
+// MARK: - Session State Persistence
+
+/// Persists session state to UserDefaults for app termination recovery
+struct SessionStatePersistence {
+    private static let sessionKey = "com.englishbrain.session.current"
+    private static let progressKey = "com.englishbrain.session.progress"
+    private static let attemptKey = "com.englishbrain.session.attempt"
+    private static let statsKey = "com.englishbrain.session.stats"
+
+    static func save(
+        sessionId: UUID,
+        progress: SessionProgress,
+        attemptState: SessionAttemptState,
+        combo: Int,
+        totalCorrect: Int,
+        totalAttempts: Int
+    ) {
+        let defaults = UserDefaults.standard
+
+        // Save session ID
+        defaults.set(sessionId.uuidString, forKey: sessionKey)
+
+        // Save progress
+        let progressData = encodeProgress(progress)
+        defaults.set(progressData, forKey: progressKey)
+
+        // Save attempt state
+        if let attemptData = try? JSONEncoder().encode(attemptState) {
+            defaults.set(attemptData, forKey: attemptKey)
+        }
+
+        // Save stats
+        let stats = ["combo": combo, "totalCorrect": totalCorrect, "totalAttempts": totalAttempts]
+        defaults.set(stats, forKey: statsKey)
+
+        defaults.synchronize()
+    }
+
+    static func load() -> (sessionId: UUID, progress: SessionProgress, attemptState: SessionAttemptState, combo: Int, totalCorrect: Int, totalAttempts: Int)? {
+        let defaults = UserDefaults.standard
+
+        // Load session ID
+        guard let sessionIdString = defaults.string(forKey: sessionKey),
+              let sessionId = UUID(uuidString: sessionIdString) else {
+            return nil
+        }
+
+        // Load progress
+        guard let progressData = defaults.dictionary(forKey: progressKey),
+              let progress = decodeProgress(progressData) else {
+            return nil
+        }
+
+        // Load attempt state
+        var attemptState = SessionAttemptState()
+        if let attemptData = defaults.data(forKey: attemptKey),
+           let decoded = try? JSONDecoder().decode(SessionAttemptState.self, from: attemptData) {
+            attemptState = decoded
+        }
+
+        // Load stats
+        let stats = defaults.dictionary(forKey: statsKey) ?? [:]
+        let combo = stats["combo"] as? Int ?? 0
+        let totalCorrect = stats["totalCorrect"] as? Int ?? 0
+        let totalAttempts = stats["totalAttempts"] as? Int ?? 0
+
+        return (sessionId, progress, attemptState, combo, totalCorrect, totalAttempts)
+    }
+
+    static func clear() {
+        let defaults = UserDefaults.standard
+        defaults.removeObject(forKey: sessionKey)
+        defaults.removeObject(forKey: progressKey)
+        defaults.removeObject(forKey: attemptKey)
+        defaults.removeObject(forKey: statsKey)
+        defaults.synchronize()
+    }
+
+    private static func encodeProgress(_ progress: SessionProgress) -> [String: Any] {
+        switch progress {
+        case .notStarted:
+            return ["type": "notStarted"]
+        case .inProgress(let phaseIndex, let itemIndex):
+            return ["type": "inProgress", "phaseIndex": phaseIndex, "itemIndex": itemIndex]
+        case .phaseComplete(let phaseIndex):
+            return ["type": "phaseComplete", "phaseIndex": phaseIndex]
+        case .sessionComplete:
+            return ["type": "sessionComplete"]
+        }
+    }
+
+    private static func decodeProgress(_ data: [String: Any]) -> SessionProgress? {
+        guard let type = data["type"] as? String else { return nil }
+
+        switch type {
+        case "notStarted":
+            return .notStarted
+        case "inProgress":
+            guard let phaseIndex = data["phaseIndex"] as? Int,
+                  let itemIndex = data["itemIndex"] as? Int else { return nil }
+            return .inProgress(phaseIndex: phaseIndex, itemIndex: itemIndex)
+        case "phaseComplete":
+            guard let phaseIndex = data["phaseIndex"] as? Int else { return nil }
+            return .phaseComplete(phaseIndex: phaseIndex)
+        case "sessionComplete":
+            return .sessionComplete
+        default:
+            return nil
+        }
+    }
+}
+
 enum SessionProgress {
     case notStarted
     case inProgress(phaseIndex: Int, itemIndex: Int)
@@ -15,13 +127,14 @@ enum SessionProgress {
     case sessionComplete
 }
 
-struct SessionAttemptState {
+struct SessionAttemptState: Codable {
     var selectedTokenIds: [String] = []
     var hintsUsed: Int = 0
     var startTime: Date = Date()
     var attemptCount: Int = 0
 }
 
+@MainActor
 class SessionStateManager: ObservableObject {
     @Published var session: Session?
     @Published var progress: SessionProgress = .notStarted
@@ -64,11 +177,50 @@ class SessionStateManager: ObservableObject {
         self.session = session
         self.progress = .inProgress(phaseIndex: 0, itemIndex: 0)
         updateCurrentPhaseAndItem()
+        saveState()
+    }
+
+    /// Attempt to restore previous session state
+    func restoreStateIfAvailable() -> Bool {
+        guard let savedState = SessionStatePersistence.load() else {
+            return false
+        }
+
+        // Validate session ID matches current session
+        guard let session = session, session.sessionId == savedState.sessionId else {
+            SessionStatePersistence.clear()
+            return false
+        }
+
+        // Restore state
+        progress = savedState.progress
+        attemptState = savedState.attemptState
+        combo = savedState.combo
+        totalCorrect = savedState.totalCorrect
+        totalAttempts = savedState.totalAttempts
+
+        updateCurrentPhaseAndItem()
+        return true
+    }
+
+    private func saveState() {
+        guard let session = session else { return }
+
+        SessionStatePersistence.save(
+            sessionId: session.sessionId,
+            progress: progress,
+            attemptState: attemptState,
+            combo: combo,
+            totalCorrect: totalCorrect,
+            totalAttempts: totalAttempts
+        )
+    }
+
+    func clearSavedState() {
+        SessionStatePersistence.clear()
     }
 
     func moveToNextItem() {
-        guard let session = session else { return }
-
         let nextItemIndex = currentItemIndex + 1
 
         if let phase = currentPhase, nextItemIndex >= phase.itemIds.count {
@@ -79,6 +231,8 @@ class SessionStateManager: ObservableObject {
             progress = .inProgress(phaseIndex: currentPhaseIndex, itemIndex: nextItemIndex)
             updateCurrentPhaseAndItem()
         }
+
+        saveState()
     }
 
     func moveToNextPhase() {
@@ -87,14 +241,16 @@ class SessionStateManager: ObservableObject {
         let nextPhaseIndex = currentPhaseIndex + 1
 
         if nextPhaseIndex >= session.phases.count {
-            // Session complete
+            // Session complete - clear saved state
             progress = .sessionComplete
             currentPhase = nil
             currentItem = nil
+            clearSavedState()
         } else {
             // Start next phase
             progress = .inProgress(phaseIndex: nextPhaseIndex, itemIndex: 0)
             updateCurrentPhaseAndItem()
+            saveState()
         }
     }
 
@@ -132,9 +288,12 @@ class SessionStateManager: ObservableObject {
         } else {
             combo = 0
         }
+
+        saveState()
     }
 
     func useHint() {
         attemptState.hintsUsed += 1
+        saveState()
     }
 }

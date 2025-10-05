@@ -43,6 +43,7 @@ enum APIEnvironment {
     }
 }
 
+@MainActor
 class APIConfiguration {
     static let shared = APIConfiguration()
 
@@ -55,14 +56,9 @@ class APIConfiguration {
     static let environment: APIEnvironment = .production
     #endif
 
-    // Thread-safe headers management
-    private let queue = DispatchQueue(label: "com.englishbrain.api-config", attributes: .concurrent)
+    // Thread-safe: @MainActor ensures all access happens on main thread
+    // No need for manual queue management since SDK's customHeaders must be set on main thread anyway
     private var _customHeaders: [String: String] = [:]
-
-    private var customHeaders: [String: String] {
-        get { queue.sync { _customHeaders } }
-        set { queue.async(flags: .barrier) { [weak self] in self?._customHeaders = newValue } }
-    }
 
     private init() {
         configure()
@@ -71,7 +67,7 @@ class APIConfiguration {
     func configure() {
         let env = Self.environment
 
-        // Set base URL
+        // Set base URL (SDK allows this from any thread)
         EnglishBrainAPIAPI.basePath = env.baseURL
 
         // Set initial headers
@@ -82,7 +78,7 @@ class APIConfiguration {
             headers["Authorization"] = "Bearer \(mockToken)"
         }
 
-        customHeaders = headers
+        _customHeaders = headers
         EnglishBrainAPIAPI.customHeaders = headers
 
         print("✅ API configured:")
@@ -92,30 +88,24 @@ class APIConfiguration {
     }
 
     func setAuthToken(_ token: String) {
-        queue.async(flags: .barrier) { [weak self] in
-            guard let self = self else { return }
-            self._customHeaders["Authorization"] = "Bearer \(token)"
-            DispatchQueue.main.async {
-                EnglishBrainAPIAPI.customHeaders["Authorization"] = "Bearer \(token)"
-                print("✅ Auth token updated")
-            }
-        }
+        _customHeaders["Authorization"] = "Bearer \(token)"
+        EnglishBrainAPIAPI.customHeaders["Authorization"] = "Bearer \(token)"
+        print("✅ Auth token updated")
     }
 
     func clearAuthToken() {
-        queue.async(flags: .barrier) { [weak self] in
-            guard let self = self else { return }
-            self._customHeaders.removeValue(forKey: "Authorization")
-            DispatchQueue.main.async {
-                EnglishBrainAPIAPI.customHeaders.removeValue(forKey: "Authorization")
+        _customHeaders.removeValue(forKey: "Authorization")
+        EnglishBrainAPIAPI.customHeaders.removeValue(forKey: "Authorization")
 
-                // Re-apply mock token if in development
-                if Self.environment == .development,
-                   let mockToken = Self.environment.mockAuthToken {
-                    EnglishBrainAPIAPI.customHeaders["Authorization"] = "Bearer \(mockToken)"
-                }
-                print("✅ Auth token cleared")
-            }
+        // Re-apply mock token if in development
+        if Self.environment == .development,
+           let mockToken = Self.environment.mockAuthToken {
+            EnglishBrainAPIAPI.customHeaders["Authorization"] = "Bearer \(mockToken)"
         }
+        print("✅ Auth token cleared")
+    }
+
+    func getAuthToken() -> String? {
+        _customHeaders["Authorization"]
     }
 }

@@ -117,7 +117,7 @@ struct ReviewView: View {
             HStack {
                 Image(systemName: "text.bubble")
                     .foregroundColor(.ebPrimary)
-                Text("복습 문제")
+                Text("복습할 문제")
                     .font(.ebLabel)
                     .foregroundColor(.ebTextSecondary)
             }
@@ -148,7 +148,7 @@ struct ReviewView: View {
 
     private var slotsView: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("문장 구성하기")
+            Text("문장 만들기")
                 .font(.ebLabel)
                 .foregroundColor(.ebTextSecondary)
 
@@ -210,7 +210,7 @@ struct ReviewView: View {
 
     private var tokensView: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("사용 가능한 단어")
+            Text("사용할 단어")
                 .font(.ebLabel)
                 .foregroundColor(.ebTextSecondary)
 
@@ -251,7 +251,7 @@ struct ReviewView: View {
 
     private var submitButton: some View {
         PrimaryButton(
-            title: "확인",
+            title: "제출하기",
             action: { viewModel.submitAnswer() },
             isEnabled: viewModel.slots.allSatisfy { $0.token != nil }
         )
@@ -264,7 +264,7 @@ struct ReviewView: View {
         VStack(spacing: 16) {
             ProgressView()
                 .scaleEffect(1.5)
-            Text("복습 준비 중...")
+            Text("복습 문제 불러오는 중...")
                 .font(.ebBody)
                 .foregroundColor(.ebTextSecondary)
         }
@@ -276,7 +276,7 @@ struct ReviewView: View {
                 .font(.system(size: 48))
                 .foregroundColor(.ebError)
 
-            Text("복습을 불러올 수 없습니다")
+            Text("복습을 불러올 수 없어요")
                 .font(.ebH3)
                 .foregroundColor(.ebTextPrimary)
 

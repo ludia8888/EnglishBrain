@@ -90,7 +90,7 @@ struct PatternWeaknessCard: View {
                     if let hintRate = pattern.hintRate {
                         StatBadge(
                             icon: "lightbulb.fill",
-                            label: "힌트",
+                            label: "힌트 사용",
                             value: "\(Int(hintRate * 100))%",
                             color: .ebInfo
                         )
@@ -99,7 +99,7 @@ struct PatternWeaknessCard: View {
                     if let firstTryRate = pattern.firstTryRate {
                         StatBadge(
                             icon: "target",
-                            label: "1차 성공",
+                            label: "첫 시도 성공",
                             value: "\(Int(firstTryRate * 100))%",
                             color: .ebSuccess
                         )
@@ -150,9 +150,9 @@ struct PatternWeaknessCard: View {
 
     private var trendText: String {
         switch pattern.trend {
-        case .improving: return "개선"
-        case .stable: return "유지"
-        case .declining: return "하락"
+        case .improving: return "개선 중"
+        case .stable: return "유지 중"
+        case .declining: return "주의 필요"
         }
     }
 

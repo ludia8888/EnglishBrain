@@ -7,6 +7,7 @@ import {
   updateUserProfile,
   buildHomeSummary,
   getWidgetSnapshot,
+  applyTutorialCompletion,
 } from '../services/userService';
 
 const router = Router();
@@ -74,6 +75,26 @@ router.get('/me/pattern-conquests', async (req, res) => {
   // TODO: replace with Firestore-driven aggregation.
   const patterns = getSamplePatternConquests();
   res.json({ patterns });
+});
+
+router.post('/me/tutorial-completions', async (req, res) => {
+  const uid = req.user?.uid;
+  if (!uid) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+  const { tutorialId, completedAt } = req.body ?? {};
+  if (typeof tutorialId !== 'string' || tutorialId.trim().length === 0) {
+    return res.status(400).json({ message: 'tutorialId is required' });
+  }
+  if (typeof completedAt !== 'string' || Number.isNaN(Date.parse(completedAt))) {
+    return res.status(400).json({ message: 'completedAt must be an ISO date-time string' });
+  }
+  try {
+    const resp = await applyTutorialCompletion(uid, tutorialId, completedAt);
+    return res.status(202).json(resp);
+  } catch (e) {
+    return res.status(500).json({ message: (e as Error).message });
+  }
 });
 
 export default router;

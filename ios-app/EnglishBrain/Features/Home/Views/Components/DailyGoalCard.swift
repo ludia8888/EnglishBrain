@@ -56,7 +56,7 @@ struct DailyGoalCard: View {
                         }
                     }
 
-                    Text("\(dailyGoal.sentences)문장 · \(dailyGoal.minutes)분")
+                    Text("\(dailyGoal.sentences)문장 | 약 \(dailyGoal.minutes)분")
                         .font(.ebBody)
                         .foregroundColor(.ebTextSecondary)
 
@@ -101,8 +101,8 @@ struct DailyGoalCard: View {
 
     private func tierLabel(_ tier: HomeSummaryDailyGoal.Tier) -> String {
         switch tier {
-        case .basic: return "베이직"
-        case .intensive: return "인텐시브"
+        case .basic: return "기본 코스"
+        case .intensive: return "심화 코스"
         }
     }
 

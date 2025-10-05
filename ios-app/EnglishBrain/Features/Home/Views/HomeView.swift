@@ -16,14 +16,13 @@ struct HomeView: View {
     @State private var selectedPatternId: String?
 
     var body: some View {
-        NavigationView {
-            ZStack {
-                Color.ebBackground.ignoresSafeArea()
+        ZStack {
+            Color.ebBackground.ignoresSafeArea()
 
-                if viewModel.isLoading && viewModel.homeSummary == nil {
-                    ProgressView()
-                        .scaleEffect(1.5)
-                } else if let summary = viewModel.homeSummary {
+            if viewModel.isLoading && viewModel.homeSummary == nil {
+                ProgressView()
+                    .scaleEffect(1.5)
+            } else if let summary = viewModel.homeSummary {
                     ScrollView {
                         VStack(spacing: 24) {
                             // Header
@@ -52,7 +51,7 @@ struct HomeView: View {
                             // Pattern Weakness Cards
                             if !summary.patternCards.isEmpty {
                                 VStack(alignment: .leading, spacing: 12) {
-                                    Text("약점 패턴")
+                                    Text("지금 집중할 패턴")
                                         .font(.ebH4)
                                         .foregroundColor(.ebTextPrimary)
                                         .padding(.horizontal)
@@ -75,7 +74,7 @@ struct HomeView: View {
                             // Recommended Actions
                             if !summary.recommendedActions.isEmpty {
                                 VStack(alignment: .leading, spacing: 12) {
-                                    Text("추천 활동")
+                                    Text("오늘 추천 활동")
                                         .font(.ebH4)
                                         .foregroundColor(.ebTextPrimary)
                                         .padding(.horizontal)
@@ -102,7 +101,7 @@ struct HomeView: View {
                             .font(.system(size: 48))
                             .foregroundColor(.ebError)
 
-                        Text("데이터를 불러올 수 없습니다")
+                        Text("잠시 연결이 끊겼어요")
                             .font(.ebH4)
                             .foregroundColor(.ebTextPrimary)
 
@@ -116,14 +115,16 @@ struct HomeView: View {
                     }
                     .padding()
                 }
-            }
-            .navigationBarHidden(true)
-            .fullScreenCover(isPresented: $showSession) {
-                SessionView()
-            }
-            .fullScreenCover(isPresented: $showReview) {
-                ReviewView(patternId: selectedPatternId, targetSentences: 6)
-            }
+        }
+        .navigationBarHidden(true)
+        .fullScreenCover(isPresented: $showSession) {
+            SessionView()
+        }
+        .fullScreenCover(isPresented: $showReview) {
+            ReviewView(patternId: selectedPatternId, targetSentences: 6)
+        }
+        .task {
+            viewModel.loadHomeSummaryIfNeeded()
         }
     }
 
@@ -157,10 +158,10 @@ struct HomeView: View {
 
     private func greetingMessage(_ summary: HomeSummary) -> String {
         if summary.progress.sentencesCompleted >= summary.dailyGoal.sentences {
-            return "🎉 오늘의 목표를 달성했어요!"
+            return "오늘도 해냈어요!"
         } else {
             let remaining = summary.dailyGoal.sentences - summary.progress.sentencesCompleted
-            return "오늘 \(remaining)문장 남았어요"
+            return "오늘 \(remaining)문장만 더 하면 완료예요"
         }
     }
 }

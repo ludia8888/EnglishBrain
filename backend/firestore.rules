@@ -4,6 +4,10 @@ service cloud.firestore {
     match /users/{userId} {
       allow read, update, delete: if request.auth != null && request.auth.uid == userId;
       allow create: if request.auth != null && request.auth.uid == userId;
+      match /tutorial_completions/{docId} {
+        allow create, get, list: if request.auth != null && request.auth.uid == userId;
+        allow update, delete: if false;
+      }
     }
 
     match /lessons/{lessonId} {

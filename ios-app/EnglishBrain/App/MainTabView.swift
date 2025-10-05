@@ -6,100 +6,90 @@
 //
 
 import SwiftUI
+import EnglishBrainAPI
 
 struct MainTabView: View {
     @StateObject private var deepLinkRouter = DeepLinkRouter()
-    @State private var selectedTab = 0
-    @State private var showSessionView = false
-    @State private var showReviewView = false
-    @State private var sessionPatternId: String?
-    @State private var reviewPatternId: String?
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            HomeView()
-                .tabItem {
-                    Label("홈", systemImage: "house.fill")
-                }
-                .tag(0)
+        TabView(selection: $deepLinkRouter.selectedTab) {
+            // Home Tab with NavigationStack
+            NavigationStack(path: $deepLinkRouter.homePath) {
+                HomeView()
+                    .navigationDestination(for: DeepLinkDestination.self) { destination in
+                        destinationView(for: destination)
+                    }
+            }
+            .tabItem {
+                Label("홈", systemImage: "house.fill")
+            }
+            .tag(0)
 
-            PatternsListView()
-                .tabItem {
-                    Label("패턴", systemImage: "chart.line.uptrend.xyaxis")
-                }
-                .tag(1)
+            // Patterns Tab with NavigationStack
+            NavigationStack(path: $deepLinkRouter.patternsPath) {
+                PatternsListView()
+                    .navigationDestination(for: DeepLinkDestination.self) { destination in
+                        destinationView(for: destination)
+                    }
+            }
+            .tabItem {
+                Label("패턴", systemImage: "chart.line.uptrend.xyaxis")
+            }
+            .tag(1)
 
-            NotificationDigestView()
-                .tabItem {
-                    Label("알림", systemImage: "bell.fill")
-                }
-                .tag(2)
+            // Notifications Tab with NavigationStack
+            NavigationStack(path: $deepLinkRouter.notificationsPath) {
+                NotificationDigestView()
+                    .navigationDestination(for: DeepLinkDestination.self) { destination in
+                        destinationView(for: destination)
+                    }
+            }
+            .tabItem {
+                Label("알림", systemImage: "bell.fill")
+            }
+            .tag(2)
 
-            ProfileView()
-                .tabItem {
-                    Label("프로필", systemImage: "person.fill")
-                }
-                .tag(3)
+            // Profile Tab with NavigationStack
+            NavigationStack(path: $deepLinkRouter.profilePath) {
+                ProfileView()
+                    .navigationDestination(for: DeepLinkDestination.self) { destination in
+                        destinationView(for: destination)
+                    }
+            }
+            .tabItem {
+                Label("프로필", systemImage: "person.fill")
+            }
+            .tag(3)
         }
         .accentColor(.ebPrimary)
         .environmentObject(deepLinkRouter)
-        .sheet(isPresented: $showSessionView) {
-            if let patternId = sessionPatternId {
-                Text("TODO: Start session for pattern \(patternId)")
-            } else {
-                Text("TODO: Start daily session")
-            }
-        }
-        .sheet(isPresented: $showReviewView) {
-            if let patternId = reviewPatternId {
-                Text("TODO: Start review for pattern \(patternId)")
-            } else {
-                Text("TODO: Start general review")
-            }
-        }
-        .onChange(of: deepLinkRouter.activeDestination) { destination in
-            handleDeepLink(destination)
-        }
     }
 
-    private func handleDeepLink(_ destination: DeepLinkDestination?) {
-        guard let destination = destination else { return }
-
+    @ViewBuilder
+    private func destinationView(for destination: DeepLinkDestination) -> some View {
         switch destination {
-        case .home:
-            selectedTab = 0
-
         case .session(let patternId):
-            sessionPatternId = patternId
-            showSessionView = true
+            if let patternId = patternId {
+                Text("TODO: Session for pattern \(patternId)")
+            } else {
+                SessionView()
+            }
 
         case .review(let patternId):
-            reviewPatternId = patternId
-            showReviewView = true
+            ReviewView(patternId: patternId, targetSentences: 6)
 
         case .brainBurst:
-            // TODO: Show Brain Burst explanation or start session
-            selectedTab = 0
+            Text("TODO: Brain Burst explanation")
+                .navigationTitle("Brain Burst")
 
         case .pattern(let id):
-            // TODO: Navigate to pattern detail
-            selectedTab = 1
-            print("TODO: Navigate to pattern \(id)")
-
-        case .profile:
-            selectedTab = 3
-
-        case .streak:
-            selectedTab = 3
-            // TODO: Scroll to streak section
+            // TODO: Create PatternDetailView that takes pattern ID
+            Text("TODO: Pattern detail for \(id)")
+                .navigationTitle("패턴 상세")
 
         case .unknown:
-            print("⚠️ Unknown destination")
-        }
-
-        // Reset after handling
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            deepLinkRouter.reset()
+            Text("잘못된 링크예요")
+                .navigationTitle("오류")
         }
     }
 }

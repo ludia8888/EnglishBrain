@@ -180,7 +180,8 @@ struct BrainBurstAnimationView: View {
             sparks.append(spark)
 
             // Remove spark after animation
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
                 sparks.removeAll { $0.id == spark.id }
             }
         }

@@ -12,11 +12,11 @@ info:
     email: api@englishbrain.app
 jsonSchemaDialect: https://json-schema.org/draft/2020-12/schema
 servers:
-  - url: https://api.englishbrain.app/v1
+  - url: https://api.englishbrain.app
     description: Production
-  - url: https://staging-api.englishbrain.app/v1
+  - url: https://staging-api.englishbrain.app
     description: Staging
-  - url: http://localhost:8080/v1
+  - url: http://localhost:8080
     description: Local development
 security:
   - FirebaseAuth: []

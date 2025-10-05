@@ -79,6 +79,41 @@ export async function applySessionCompletion(uid: string, summary: SessionSummar
   };
 }
 
+// applyLevelTestResult defined below with extended metadata write
+
+export async function applyTutorialCompletion(
+  uid: string,
+  tutorialId: string,
+  completedAt: string
+): Promise<{ tutorialId: string; streakEligible: boolean; personalizationUnlocked: boolean }> {
+  const profile = await ensureUserProfile({ uid });
+  const personalizationUnlocked = !profile.flags.tutorialCompleted || !profile.flags.personalizationReady;
+  const updatedFlags: UserFlags = {
+    ...profile.flags,
+    tutorialCompleted: true,
+    personalizationReady: true,
+  };
+  const updatedAt = new Date().toISOString();
+  await getFirestore()
+    .collection(USERS_COLLECTION)
+    .doc(uid)
+    .set(
+      {
+        flags: updatedFlags,
+        updatedAt,
+      },
+      { merge: true }
+    );
+  // optionally write a completion record under subcollection
+  await getFirestore()
+    .collection(USERS_COLLECTION)
+    .doc(uid)
+    .collection('tutorial_completions')
+    .doc(tutorialId)
+    .set({ tutorialId, completedAt, createdAt: updatedAt });
+
+  return { tutorialId, streakEligible: true, personalizationUnlocked };
+}
 export async function applyLevelTestResult(uid: string, result: LevelTestResult): Promise<void> {
   const profile = await ensureUserProfile({ uid });
   const updatedFlags: UserFlags = {

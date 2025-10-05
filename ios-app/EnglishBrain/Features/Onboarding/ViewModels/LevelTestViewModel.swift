@@ -50,118 +50,64 @@ class LevelTestViewModel: ObservableObject {
         loadMockItems()
     }
 
-    // MARK: - Mock Data (TODO: Replace with API call GET /level-tests)
+    // MARK: - Mock Data Loading from JSON
+    // TODO: Replace with API call GET /level-tests when backend ready
     private func loadMockItems() {
-        items = [
-            LevelTestItem(
-                id: "1",
-                koreanSentence: "나는 영어를 공부한다",
-                tokens: [
-                    TokenItem(id: "1-1", text: "I", correctSlot: .subject),
-                    TokenItem(id: "1-2", text: "study", correctSlot: .verb),
-                    TokenItem(id: "1-3", text: "English", correctSlot: .object)
-                ],
-                correctOrder: [.subject, .verb, .object]
-            ),
-            LevelTestItem(
-                id: "2",
-                koreanSentence: "그녀는 매일 아침 커피를 마신다",
-                tokens: [
-                    TokenItem(id: "2-1", text: "She", correctSlot: .subject),
-                    TokenItem(id: "2-2", text: "drinks", correctSlot: .verb),
-                    TokenItem(id: "2-3", text: "coffee", correctSlot: .object),
-                    TokenItem(id: "2-4", text: "every morning", correctSlot: .modifier)
-                ],
-                correctOrder: [.subject, .verb, .object, .modifier]
-            ),
-            LevelTestItem(
-                id: "3",
-                koreanSentence: "우리는 내일 영화를 볼 것이다",
-                tokens: [
-                    TokenItem(id: "3-1", text: "We", correctSlot: .subject),
-                    TokenItem(id: "3-2", text: "will watch", correctSlot: .verb),
-                    TokenItem(id: "3-3", text: "a movie", correctSlot: .object),
-                    TokenItem(id: "3-4", text: "tomorrow", correctSlot: .modifier)
-                ],
-                correctOrder: [.subject, .verb, .object, .modifier]
-            ),
-            LevelTestItem(
-                id: "4",
-                koreanSentence: "그는 공원에서 달린다",
-                tokens: [
-                    TokenItem(id: "4-1", text: "He", correctSlot: .subject),
-                    TokenItem(id: "4-2", text: "runs", correctSlot: .verb),
-                    TokenItem(id: "4-3", text: "in the park", correctSlot: .modifier)
-                ],
-                correctOrder: [.subject, .verb, .modifier]
-            ),
-            LevelTestItem(
-                id: "5",
-                koreanSentence: "그들은 어제 박물관을 방문했다",
-                tokens: [
-                    TokenItem(id: "5-1", text: "They", correctSlot: .subject),
-                    TokenItem(id: "5-2", text: "visited", correctSlot: .verb),
-                    TokenItem(id: "5-3", text: "the museum", correctSlot: .object),
-                    TokenItem(id: "5-4", text: "yesterday", correctSlot: .modifier)
-                ],
-                correctOrder: [.subject, .verb, .object, .modifier]
-            ),
-            LevelTestItem(
-                id: "6",
-                koreanSentence: "나는 책을 읽고 있다",
-                tokens: [
-                    TokenItem(id: "6-1", text: "I", correctSlot: .subject),
-                    TokenItem(id: "6-2", text: "am reading", correctSlot: .verb),
-                    TokenItem(id: "6-3", text: "a book", correctSlot: .object)
-                ],
-                correctOrder: [.subject, .verb, .object]
-            ),
-            LevelTestItem(
-                id: "7",
-                koreanSentence: "그녀는 친구들과 함께 저녁을 먹었다",
-                tokens: [
-                    TokenItem(id: "7-1", text: "She", correctSlot: .subject),
-                    TokenItem(id: "7-2", text: "had", correctSlot: .verb),
-                    TokenItem(id: "7-3", text: "dinner", correctSlot: .object),
-                    TokenItem(id: "7-4", text: "with friends", correctSlot: .modifier)
-                ],
-                correctOrder: [.subject, .verb, .object, .modifier]
-            ),
-            LevelTestItem(
-                id: "8",
-                koreanSentence: "학생들은 교실에서 공부한다",
-                tokens: [
-                    TokenItem(id: "8-1", text: "Students", correctSlot: .subject),
-                    TokenItem(id: "8-2", text: "study", correctSlot: .verb),
-                    TokenItem(id: "8-3", text: "in the classroom", correctSlot: .modifier)
-                ],
-                correctOrder: [.subject, .verb, .modifier]
-            ),
-            LevelTestItem(
-                id: "9",
-                koreanSentence: "그는 매우 빠르게 달린다",
-                tokens: [
-                    TokenItem(id: "9-1", text: "He", correctSlot: .subject),
-                    TokenItem(id: "9-2", text: "runs", correctSlot: .verb),
-                    TokenItem(id: "9-3", text: "very fast", correctSlot: .modifier)
-                ],
-                correctOrder: [.subject, .verb, .modifier]
-            ),
-            LevelTestItem(
-                id: "10",
-                koreanSentence: "우리는 주말에 쇼핑을 갈 것이다",
-                tokens: [
-                    TokenItem(id: "10-1", text: "We", correctSlot: .subject),
-                    TokenItem(id: "10-2", text: "will go", correctSlot: .verb),
-                    TokenItem(id: "10-3", text: "shopping", correctSlot: .object),
-                    TokenItem(id: "10-4", text: "on the weekend", correctSlot: .modifier)
-                ],
-                correctOrder: [.subject, .verb, .object, .modifier]
-            )
-        ]
+        guard let url = Bundle.main.url(forResource: "level-test", withExtension: "json"),
+              let data = try? Data(contentsOf: url) else {
+            print("❌ Failed to load level-test.json")
+            return
+        }
 
-        if let first = items.first {
-            initializeSlots(for: first)
+        do {
+            let decoder = JSONDecoder()
+            let levelTestData = try decoder.decode(LevelTestData.self, from: data)
+
+            // Convert JSON items to LevelTestItem and shuffle to prevent memorization
+            items = levelTestData.items.map { $0.toLevelTestItem() }.shuffled()
+
+            print("✅ Loaded \(items.count) level test items from JSON")
+
+            if let first = items.first {
+                initializeSlots(for: first)
+            }
+        } catch {
+            print("❌ Failed to decode level-test.json: \(error)")
+        }
+    }
+
+    // MARK: - JSON Data Models
+    private struct LevelTestData: Codable {
+        let items: [JSONLevelTestItem]
+    }
+
+    private struct JSONLevelTestItem: Codable {
+        let id: String
+        let koreanSentence: String
+        let tokens: [JSONTokenItem]
+        let correctOrder: [String]
+
+        func toLevelTestItem() -> LevelTestItem {
+            return LevelTestItem(
+                id: id,
+                koreanSentence: koreanSentence,
+                tokens: tokens.map { $0.toTokenItem() },
+                correctOrder: correctOrder.compactMap { SlotType(rawValue: $0) }
+            )
+        }
+    }
+
+    private struct JSONTokenItem: Codable {
+        let id: String
+        let text: String
+        let correctSlot: String
+
+        func toTokenItem() -> TokenItem {
+            return TokenItem(
+                id: id,
+                text: text,
+                correctSlot: SlotType(rawValue: correctSlot) ?? .subject
+            )
         }
     }
 
@@ -351,28 +297,41 @@ class LevelTestViewModel: ObservableObject {
             completedAt: lastAttempt.metrics.endTime ?? Date()
         )
 
+        if AppEnvironment.shared.usesMockData {
+            print("🧪 Using mock LevelTest submission results")
+            isLoading = false
+            completeSubmission(with: MockDataProvider.shared.makeLevelTestResult())
+            return
+        }
+
         print("📤 Submitting level test with \(attempts.count) attempts")
 
         // Real API call using OnboardingAPI
         OnboardingAPI.submitLevelTest(levelTestSubmission: submission) { [weak self] response, error in
-            DispatchQueue.main.async {
-                self?.isLoading = false
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+
+                self.isLoading = false
 
                 if let error = error {
-                    self?.errorMessage = error.localizedDescription
+                    self.errorMessage = error.localizedDescription
                     print("❌ Level test submission failed: \(error)")
                 } else if let result = response {
-                    print("✅ Level test submitted successfully")
-                    print("Recommended level: \(result.recommendedLevel)")
-                    print("Confidence: \(result.confidence)")
-                    print("Rationale: \(result.rationale)")
-                    print("Next lesson ID: \(result.nextLessonId)")
-
-                    // Notify completion to coordinator
-                    self?.onComplete?()
+                    self.completeSubmission(with: result)
                 }
             }
         }
+    }
+
+    private func completeSubmission(with result: LevelTestResult) {
+        print("✅ Level test submitted successfully")
+        print("Recommended level: \(result.recommendedLevel)")
+        print("Confidence: \(result.confidence)")
+        print("Rationale: \(result.rationale)")
+        print("Next lesson ID: \(result.nextLessonId)")
+
+        // Notify completion to coordinator
+        onComplete?()
     }
 
     // MARK: - Helper Structures

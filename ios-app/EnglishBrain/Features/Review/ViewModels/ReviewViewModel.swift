@@ -77,7 +77,7 @@ class ReviewViewModel: ObservableObject {
         )
 
         ReviewsAPI.createReview(reviewCreateRequest: request) { [weak self] response, error in
-            DispatchQueue.main.async {
+            Task { @MainActor [weak self] in
                 self?.isLoading = false
 
                 if let error = error {
@@ -197,7 +197,8 @@ class ReviewViewModel: ObservableObject {
         print("Reference: \(normalizedReference)")
 
         // Move to next item
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+        Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: 500_000_000)
             self?.nextItem()
         }
     }
@@ -232,7 +233,7 @@ class ReviewViewModel: ObservableObject {
         isLoading = true
 
         ReviewsAPI.updateReview(reviewId: plan.reviewId, reviewUpdateRequest: request) { [weak self] response, error in
-            DispatchQueue.main.async {
+            Task { @MainActor [weak self] in
                 self?.isLoading = false
 
                 if let error = error {

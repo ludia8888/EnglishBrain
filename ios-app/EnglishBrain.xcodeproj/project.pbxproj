@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 63;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -20,6 +20,7 @@
 		51D532B8C6AAAB3232AC9908 /* StreakCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802E8A7A6961E8241F110B61 /* StreakCalendarView.swift */; };
 		58414E69662B0CAB7BF79CCD /* SessionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFBD532031346EB60471981C /* SessionState.swift */; };
 		598B8588295698BC39A7CEFA /* ReviewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B93AA43DD0026CAF3F254A0B /* ReviewViewModel.swift */; };
+		5FA3D2C1B4E69780AC12BD34 /* SessionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C8E1B5A7D2F43E0ACB1D2EF /* SessionEngine.swift */; };
 		671CB7ECEA685F3DF5DB9FFF /* PatternDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B674FB779EAE45E3F38D1F4B /* PatternDetailViewModel.swift */; };
 		67FF42C7F5EE3C9B707549B9 /* NotificationPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD83D35DAFF91896A2CC845D /* NotificationPermissionView.swift */; };
 		686468396C836BD7B81A546A /* EnglishBrainApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97902E6E54D0C0B03A3D5911 /* EnglishBrainApp.swift */; };
@@ -27,11 +28,14 @@
 		81EAF4B0E2C4939A4812C923 /* IntroCarouselView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A0F092ECFA0C062FB007043 /* IntroCarouselView.swift */; };
 		85C8D394614D441BDBD9F84F /* BrainTokenInventoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D682894F8A70589D8AD6132C /* BrainTokenInventoryView.swift */; };
 		87E9AF7CB86E0D5DE80E45F6 /* StreakCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA92B67F8C36991720F8B6A /* StreakCard.swift */; };
+		8BF7AF3C2E917BDC007C0C0B /* AppEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF7AF3A2E917BDC007C0C0B /* AppEnvironment.swift */; };
+		8BF7AF3D2E917BDC007C0C0B /* MockDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF7AF3B2E917BDC007C0C0B /* MockDataProvider.swift */; };
 		8C66AD869A96465CC1E31601 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A95ACC99C3A332F194CEE3 /* ContentView.swift */; };
 		9E55C40039A80B18130771B4 /* APIConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F193DDEE113DAC1B9C2D118E /* APIConfiguration.swift */; };
 		AC46864EBD8A875AEB59A407 /* OnboardingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C655F72D2191CAF7DB0DDC0C /* OnboardingCoordinator.swift */; };
 		B6CC70D1765ED0971924CFE7 /* PatternDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E0116D50DA5C42DE15B8F7D /* PatternDetailView.swift */; };
 		BC2595F8BF801923635EF529 /* EnglishBrainAPI in Frameworks */ = {isa = PBXBuildFile; productRef = 309C775AB5E865179B56BFB9 /* EnglishBrainAPI */; };
+		A1F59C8B1234567890ABCDEF /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = C8E4F2A1B7D34906C2145F3E /* FirebaseCore */; };
 		BF2BB95C590677BA94645595 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9449226CD02480153E617A2 /* HomeView.swift */; };
 		BF4B36962ED0F031B6CD1523 /* NotificationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55EAF661CDE5CCA2133AEF67 /* NotificationViewModel.swift */; };
 		C154DD8103B6B7B1D69F4538 /* StreakViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 235DDF5E87055116345665DA /* StreakViewModel.swift */; };
@@ -54,8 +58,9 @@
 		22538C3AC64927C79E6807E7 /* BrainBurstAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrainBurstAnimationView.swift; sourceTree = "<group>"; };
 		235DDF5E87055116345665DA /* StreakViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakViewModel.swift; sourceTree = "<group>"; };
 		27CFE2D7545B281AAF8F50B3 /* LevelTestState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelTestState.swift; sourceTree = "<group>"; };
-		373AC0A8277782D77C6851AD /* EnglishBrain.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = EnglishBrain.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		373AC0A8277782D77C6851AD /* EnglishBrain.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EnglishBrain.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3A0F092ECFA0C062FB007043 /* IntroCarouselView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroCarouselView.swift; sourceTree = "<group>"; };
+		4C8E1B5A7D2F43E0ACB1D2EF /* SessionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionEngine.swift; sourceTree = "<group>"; };
 		55EAF661CDE5CCA2133AEF67 /* NotificationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationViewModel.swift; sourceTree = "<group>"; };
 		56482083C628E9EC091EEBC2 /* TutorialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialView.swift; sourceTree = "<group>"; };
 		5E0116D50DA5C42DE15B8F7D /* PatternDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatternDetailView.swift; sourceTree = "<group>"; };
@@ -68,6 +73,9 @@
 		802E8A7A6961E8241F110B61 /* StreakCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakCalendarView.swift; sourceTree = "<group>"; };
 		85A41241CC7807C8B20BDFA2 /* LevelTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelTestView.swift; sourceTree = "<group>"; };
 		86B9FAC1860FACF5CC37DF99 /* DailyGoalCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyGoalCard.swift; sourceTree = "<group>"; };
+		8BF7AF3A2E917BDC007C0C0B /* AppEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnvironment.swift; sourceTree = "<group>"; };
+		8BF7AF3B2E917BDC007C0C0B /* MockDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDataProvider.swift; sourceTree = "<group>"; };
+		8BF7AF3E2E918765007C0C0B /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		8F1F16E5B8004CC387D6F306 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		8F566295879F3FE91ED615FC /* ProgressRing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressRing.swift; sourceTree = "<group>"; };
 		8FFCCB1528502A866561CDFA /* SessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionViewModel.swift; sourceTree = "<group>"; };
@@ -97,6 +105,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BC2595F8BF801923635EF529 /* EnglishBrainAPI in Frameworks */,
+				A1F59C8B1234567890ABCDEF /* FirebaseCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -285,6 +294,7 @@
 			isa = PBXGroup;
 			children = (
 				CFBD532031346EB60471981C /* SessionState.swift */,
+				4C8E1B5A7D2F43E0ACB1D2EF /* SessionEngine.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -391,6 +401,8 @@
 		C161EA13C6A06DC3DD538AA8 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				8BF7AF3A2E917BDC007C0C0B /* AppEnvironment.swift */,
+				8BF7AF3B2E917BDC007C0C0B /* MockDataProvider.swift */,
 				F193DDEE113DAC1B9C2D118E /* APIConfiguration.swift */,
 				6A6343A1DCA7DFD93BEBF019 /* DeepLinkRouter.swift */,
 			);
@@ -426,6 +438,7 @@
 		EC7E1F3BE4E46A6B9D0292E4 /* EnglishBrain */ = {
 			isa = PBXGroup;
 			children = (
+				8BF7AF3E2E918765007C0C0B /* GoogleService-Info.plist */,
 				D3A95ACC99C3A332F194CEE3 /* ContentView.swift */,
 				97902E6E54D0C0B03A3D5911 /* EnglishBrainApp.swift */,
 				CC6A61E8C3167F92217B86B4 /* App */,
@@ -462,6 +475,7 @@
 			name = EnglishBrain;
 			packageProductDependencies = (
 				309C775AB5E865179B56BFB9 /* EnglishBrainAPI */,
+				C8E4F2A1B7D34906C2145F3E /* FirebaseCore */,
 			);
 			productName = EnglishBrain;
 			productReference = 373AC0A8277782D77C6851AD /* EnglishBrain.app */;
@@ -475,11 +489,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
-				TargetAttributes = {
-					46EFA71EA112BF3B19DE5A77 = {
-						DevelopmentTeam = "";
-					};
-				};
 			};
 			buildConfigurationList = A9B9787CC79ABD382039D1BF /* Build configuration list for PBXProject "EnglishBrain" */;
 			compatibilityVersion = "Xcode 14.0";
@@ -493,8 +502,8 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				2943B62B41F5C94E0E169FD8 /* XCLocalSwiftPackageReference "../sdk-swift" */,
+				8BF7AF3F2E91883A007C0C0B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
-			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -538,9 +547,12 @@
 				364012B645B1C56ABCF9357F /* ProgressRing.swift in Sources */,
 				4B68F9DA0B9594516CD880F7 /* ReviewView.swift in Sources */,
 				598B8588295698BC39A7CEFA /* ReviewViewModel.swift in Sources */,
+				8BF7AF3C2E917BDC007C0C0B /* AppEnvironment.swift in Sources */,
+				8BF7AF3D2E917BDC007C0C0B /* MockDataProvider.swift in Sources */,
 				58414E69662B0CAB7BF79CCD /* SessionState.swift in Sources */,
 				3F4BABF55B799149AE03747C /* SessionView.swift in Sources */,
 				E57E6758E91F9DC9029F6EBD /* SessionViewModel.swift in Sources */,
+				5FA3D2C1B4E69780AC12BD34 /* SessionEngine.swift in Sources */,
 				51D532B8C6AAAB3232AC9908 /* StreakCalendarView.swift in Sources */,
 				87E9AF7CB86E0D5DE80E45F6 /* StreakCard.swift in Sources */,
 				C154DD8103B6B7B1D69F4538 /* StreakViewModel.swift in Sources */,
@@ -613,8 +625,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = JYWRY223DB;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -699,8 +712,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = JYWRY223DB;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -747,10 +761,26 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		8BF7AF3F2E91883A007C0C0B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.3.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		309C775AB5E865179B56BFB9 /* EnglishBrainAPI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = EnglishBrainAPI;
+		};
+		C8E4F2A1B7D34906C2145F3E /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8BF7AF3F2E91883A007C0C0B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

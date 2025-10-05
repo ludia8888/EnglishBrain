@@ -31,7 +31,7 @@ struct StreakCard: View {
                             .foregroundColor(.ebTextSecondary)
                     }
 
-                    Text("최장 \(streak.longest)일")
+                    Text("최고 기록 \(streak.longest)일")
                         .font(.ebBodySmall)
                         .foregroundColor(.ebTextSecondary)
                 }
@@ -49,7 +49,7 @@ struct StreakCard: View {
                     .foregroundColor(.ebPrimary)
 
                     if brainTokens.pending > 0 {
-                        Text("+\(brainTokens.pending) 대기중")
+                        Text("곧 받을 토큰 +\(brainTokens.pending)")
                             .font(.ebCaption)
                             .foregroundColor(.ebInfo)
                     }
@@ -64,7 +64,7 @@ struct StreakCard: View {
                     HStack {
                         Image(systemName: "snowflake")
                             .font(.system(size: 16))
-                        Text("스트릭 프리즈 사용 (1 토큰)")
+                        Text("하루 쉬기 (토큰 1개)")
                             .font(.ebLabel)
                         Spacer()
                         Image(systemName: "chevron.right")

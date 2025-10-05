@@ -47,7 +47,7 @@ Environment variables come from `.env` (copy `.env.example`).
 firebase emulators:exec --only firestore,auth "npm run test:contract"
 ```
 
-This spins up the Firestore and Auth emulators, seeds a sample `users/{uid}` document, signs in via the Auth emulator, and exercises `/users/me`, `/users/me/home`, `/users/me/widget-snapshot`, and `/level-tests`. The tests will skip automatically if emulator hosts are not detected.
+This spins up the Firestore and Auth emulators, seeds a sample `users/{uid}` document, signs in via the Auth emulator, and exercises `/users/me`, `/users/me/home`, `/users/me/widget-snapshot`, `/level-tests`, and `/users/me/tutorial-completions`. The tests will skip automatically if emulator hosts are not detected.
 
 ### Firestore Security Rules
 
@@ -114,6 +114,31 @@ Submit level test results and receive a provisional level assignment.
 - Stores submission in `level_tests` collection
 
 **Full API schema:** See [doc/openapi.yaml](../doc/openapi.yaml)
+
+### POST /users/me/tutorial-completions
+
+Record tutorial completion during onboarding.
+
+**Request:**
+```json
+{
+  "tutorialId": "onboarding-1",
+  "completedAt": "2025-10-05T10:02:00Z"
+}
+```
+
+**Response (202):**
+```json
+{
+  "tutorialId": "onboarding-1",
+  "streakEligible": true,
+  "personalizationUnlocked": true
+}
+```
+
+**Side Effects:**
+- Sets `users/{uid}.flags.tutorialCompleted = true`, `flags.personalizationReady = true`
+- Writes a record under `users/{uid}/tutorial_completions/{tutorialId}`
 
 ## Scripts
 

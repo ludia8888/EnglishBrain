@@ -67,7 +67,7 @@ struct LevelTestView: View {
                         .font(.system(size: 60))
                         .foregroundColor(.ebError)
 
-                    Text("오류")
+                    Text("잠깐요")
                         .font(.ebH3)
                         .foregroundColor(.white)
 
@@ -123,7 +123,7 @@ struct LevelTestView: View {
 
     private func koreanSentenceView(_ item: LevelTestItem) -> some View {
         VStack(spacing: 12) {
-            Text("다음 문장을 영어로 만들어보세요")
+            Text("이 문장을 영어 어순으로 만들어볼까요?")
                 .font(.ebLabel)
                 .foregroundColor(.ebTextSecondary)
 
@@ -134,7 +134,7 @@ struct LevelTestView: View {
 
             // Hint text (shown at hint level 1)
             if viewModel.hintLevel.rawValue >= 1 {
-                Text("💡 단어를 S-V-O-M 순서로 배열하세요")
+                Text("💡 주어 → 동사 → 목적어 순서로 놓아보세요")
                     .font(.ebBodySmall)
                     .foregroundColor(.ebInfo)
                     .transition(.opacity)
@@ -171,7 +171,7 @@ struct LevelTestView: View {
 
     private var tokensView: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("단어 블록")
+            Text("사용할 단어")
                 .font(.ebLabel)
                 .foregroundColor(.ebTextSecondary)
 
@@ -197,7 +197,7 @@ struct LevelTestView: View {
         Button(action: viewModel.useHint) {
             HStack(spacing: 8) {
                 Image(systemName: "lightbulb.fill")
-                Text("힌트 (\(viewModel.hintLevel.rawValue)/3)")
+                Text("힌트 보기 (\(viewModel.hintLevel.rawValue)/3)")
             }
             .font(.ebLabel)
             .foregroundColor(viewModel.hintLevel.rawValue < 3 ? .ebPrimary : .ebTextDisabled)
@@ -215,7 +215,7 @@ struct LevelTestView: View {
                     .font(.system(size: 80))
                     .foregroundColor(viewModel.isCorrect ? .ebSuccess : .ebError)
 
-                Text(viewModel.isCorrect ? "정답입니다!" : "다시 시도해보세요")
+                Text(viewModel.isCorrect ? "맞았어요!" : "조금만 더 생각해볼까요?")
                     .font(.ebH3)
                     .foregroundColor(.white)
 
@@ -232,14 +232,14 @@ struct LevelTestView: View {
                         .frame(width: 140)
 
                         PrimaryButton(
-                            title: "힌트 보기",
+                            title: "힌트가 필요해요",
                             action: {
                                 viewModel.showFeedback = false
                                 viewModel.useHint()
                             },
                             style: .outline
                         )
-                        .frame(width: 140)
+                        .frame(width: 160)
                     }
                 }
             }
@@ -338,14 +338,14 @@ class SlotDropDelegate: DropDelegate {
         guard let itemProvider = info.itemProviders(for: [.text]).first else { return false }
 
         itemProvider.loadItem(forTypeIdentifier: "public.text", options: nil) { [weak viewModel, slotIndex = self.slotIndex] data, error in
-            guard let data = data as? Data,
-                  let tokenId = String(data: data, encoding: .utf8),
-                  let viewModel = viewModel,
-                  let token = viewModel.availableTokens.first(where: { $0.id == tokenId }) else {
-                return
-            }
-
             Task { @MainActor in
+                guard let data = data as? Data,
+                      let tokenId = String(data: data, encoding: .utf8),
+                      let viewModel = viewModel,
+                      let token = viewModel.availableTokens.first(where: { $0.id == tokenId }) else {
+                    return
+                }
+
                 viewModel.placeToken(token, in: slotIndex)
             }
         }

@@ -45,11 +45,11 @@ struct ProfileView: View {
                 .foregroundColor(.ebPrimary)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("사용자")
+                Text("학습자")
                     .font(.ebH4)
                     .foregroundColor(.ebTextPrimary)
 
-                Text("학습 중")
+                Text("성장 중")
                     .font(.ebBody)
                     .foregroundColor(.ebTextSecondary)
             }
@@ -102,8 +102,8 @@ struct ProfileView: View {
             sectionHeader("앱 정보")
 
             VStack(spacing: 12) {
-                settingRow(icon: "book.fill", title: "사용 방법", action: {})
-                settingRow(icon: "info.circle", title: "정보", action: {})
+                settingRow(icon: "book.fill", title: "앱 사용 가이드", action: {})
+                settingRow(icon: "info.circle", title: "앱 정보", action: {})
             }
 
             sectionHeader("")
@@ -111,7 +111,7 @@ struct ProfileView: View {
             VStack(spacing: 12) {
                 settingRow(
                     icon: "arrow.counterclockwise",
-                    title: "온보딩 다시 보기",
+                    title: "튜토리얼 다시 보기",
                     action: {
                         hasCompletedOnboarding = false
                     }

@@ -14,23 +14,23 @@ struct IntroCarouselView: View {
     let pages: [IntroPage] = [
         IntroPage(
             icon: "brain.head.profile",
-            title: "Think like English",
-            description: "영어를 단순히 번역하지 않고\n영어식 사고로 문장을 만들어요"
+            title: "영어로 생각하기",
+            description: "번역이 아니라, 영어로 직접 생각하는\n회로를 만들어드릴게요"
         ),
         IntroPage(
             icon: "arrow.triangle.swap",
-            title: "Drag & Build Sentences",
-            description: "단어 블록을 드래그하며\nS-V-O-M 어순으로 문장을 완성해요"
+            title: "블록으로 문장 만들기",
+            description: "손끝으로 영어 어순을 체화하세요\n드래그할수록 자연스러워져요"
         ),
         IntroPage(
             icon: "chart.line.uptrend.xyaxis",
-            title: "Pattern Mastery",
-            description: "AI가 분석한 약점 패턴을\n집중 훈련으로 정복해요"
+            title: "약점을 정복해요",
+            description: "당신만의 약점을 찾아\n집중 훈련으로 바꿔드릴게요"
         ),
         IntroPage(
             icon: "flame.fill",
-            title: "Build Your Streak",
-            description: "매일 12문장으로 습관을 만들고\nBrain Token으로 스트릭을 지켜요"
+            title: "매일 10분, 습관으로",
+            description: "하루 12문장이면 충분해요\n연속 학습 기록이 곧 당신의 성장이에요"
         )
     ]
 
@@ -39,7 +39,7 @@ struct IntroCarouselView: View {
             // Skip button
             HStack {
                 Spacer()
-                Button("Skip") {
+                Button("건너뛰기") {
                     onComplete()
                 }
                 .font(.ebLabel)

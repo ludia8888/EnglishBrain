@@ -43,7 +43,7 @@ struct StreakCalendarView: View {
                     .font(.ebH4)
                     .foregroundColor(.ebTextPrimary)
 
-                Text("매일 학습해서 스트릭을 유지하세요")
+                Text("매일 만나서 기록을 이어가요")
                     .font(.ebCaption)
                     .foregroundColor(.ebTextSecondary)
             }
@@ -61,14 +61,14 @@ struct StreakCalendarView: View {
     private var statsRow: some View {
         HStack(spacing: 24) {
             statCard(
-                title: "현재 스트릭",
+                title: "현재 연속",
                 value: "\(currentStreak)",
                 icon: "flame.fill",
                 color: .ebWarning
             )
 
             statCard(
-                title: "최장 스트릭",
+                title: "최고 기록",
                 value: "\(longestStreak)",
                 icon: "trophy.fill",
                 color: .ebSuccess

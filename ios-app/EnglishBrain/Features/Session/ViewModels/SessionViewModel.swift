@@ -29,10 +29,17 @@ class SessionViewModel: ObservableObject {
     private let impactGenerator = UIImpactFeedbackGenerator(style: .medium)
     private let notificationGenerator = UINotificationFeedbackGenerator()
 
-    // WorkItem for cancellable delayed actions (prevents race conditions)
-    private var submitDelayWorkItem: DispatchWorkItem?
+    // Cancellable delayed actions using Swift Concurrency (prevents race conditions)
+    private var submitDelayTask: Task<Void, Never>?
 
+    // Cancellables for network requests
     private var cancellables = Set<AnyCancellable>()
+    private var createSessionTask: Task<Void, Never>?
+    private let sessionEngine: SessionEngine
+
+    init(sessionEngine: SessionEngine = SessionEngine()) {
+        self.sessionEngine = sessionEngine
+    }
 
     struct SlotItem: Identifiable {
         let id: String
@@ -47,42 +54,71 @@ class SessionViewModel: ObservableObject {
     }
 
     deinit {
-        // Cancel any pending work to prevent crashes
-        submitDelayWorkItem?.cancel()
+        // Cancel all pending work to prevent crashes
+        submitDelayTask?.cancel()
+        createSessionTask?.cancel()
+        cancellables.forEach { $0.cancel() }
     }
 
     // MARK: - Session Lifecycle
 
     func startSession(mode: SessionCreateRequest.Mode = .daily) {
+        // Cancel any existing session creation request
+        createSessionTask?.cancel()
+
         isLoading = true
         errorMessage = nil
 
+        if AppEnvironment.shared.usesMockData {
+            createSessionTask = Task { @MainActor [weak self] in
+                try? await Task.sleep(nanoseconds: 250_000_000)
+                guard let self = self, !Task.isCancelled else { return }
+                let session = MockDataProvider.shared.makeSession(mode: mode)
+                self.isLoading = false
+                self.handleSessionLoaded(session)
+                self.createSessionTask = nil
+            }
+            return
+        }
+
         let request = SessionCreateRequest(mode: mode, entryPoint: "home")
 
+        // Create a cancellable work item
         SessionsAPI.createSession(sessionCreateRequest: request) { [weak self] response, error in
-            DispatchQueue.main.async {
-                self?.isLoading = false
+            Task { @MainActor [weak self] in
+                guard let self = self else { return }
+
+                self.isLoading = false
 
                 if let error = error {
-                    self?.errorMessage = error.localizedDescription
+                    self.errorMessage = error.localizedDescription
                     print("❌ Failed to create session: \(error)")
                 } else if let session = response {
-                    print("✅ Session created: \(session.sessionId)")
-                    print("Phases: \(session.phases.count)")
-                    print("Items: \(session.items.count)")
-
-                    // Check for Brain Burst activation
-                    if let burst = session.brainBurst, burst.active {
-                        self?.brainBurst = burst
-                        self?.showBrainBurst = true
-                        print("🧠⚡ Brain Burst activated! Multiplier: \(burst.multiplier)x")
-                    }
-
-                    self?.stateManager.loadSession(session)
-                    self?.loadCurrentItem()
+                    self.handleSessionLoaded(session)
                 }
+
+                // Clear pending task reference
+                self.createSessionTask = nil
             }
         }
+    }
+
+    private func handleSessionLoaded(_ session: Session) {
+        print("✅ Session loaded: \(session.sessionId)")
+        print("Phases: \(session.phases.count)")
+        print("Items: \(session.items.count)")
+
+        if let burst = session.brainBurst, burst.active {
+            brainBurst = burst
+            showBrainBurst = true
+            print("🧠⚡ Brain Burst activated! Multiplier: \(burst.multiplier)x")
+        } else {
+            brainBurst = session.brainBurst
+            showBrainBurst = false
+        }
+
+        stateManager.loadSession(session)
+        loadCurrentItem()
     }
 
     private func loadCurrentItem() {
@@ -166,10 +202,21 @@ class SessionViewModel: ObservableObject {
         // Get selected sequence
         let selectedTokenIds = slots.compactMap { $0.token?.id }
 
-        // Check correctness
+        // Check correctness using SessionEngine (off-main heavy logic)
         guard let correctSequence = stateManager.currentItem?.correctSequence else { return }
-        let isCorrect = selectedTokenIds == correctSequence
+        let validationInput = SessionEngine.ValidationInput(
+            selectedTokenIds: selectedTokenIds,
+            correctSequence: correctSequence
+        )
 
+        Task { [weak self] in
+            guard let self = self else { return }
+            let isCorrect = await self.sessionEngine.validatePlacement(validationInput)
+            await self.handleCompletionResult(isCorrect: isCorrect, selectedTokenIds: selectedTokenIds)
+        }
+    }
+
+    private func handleCompletionResult(isCorrect: Bool, selectedTokenIds: [String]) {
         // Record attempt
         stateManager.recordAttempt(selectedTokenIds: selectedTokenIds, isCorrect: isCorrect)
 
@@ -177,22 +224,22 @@ class SessionViewModel: ObservableObject {
         notificationGenerator.notificationOccurred(isCorrect ? .success : .error)
 
         // Cancel any pending delayed action to prevent race conditions
-        submitDelayWorkItem?.cancel()
+        submitDelayTask?.cancel()
 
         if isCorrect {
             // Show success, move to next item after delay
-            let workItem = DispatchWorkItem { [weak self] in
-                self?.moveToNextItem()
+            submitDelayTask = Task { @MainActor [weak self] in
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+                guard let self = self, !Task.isCancelled else { return }
+                self.moveToNextItem()
             }
-            submitDelayWorkItem = workItem
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: workItem)
         } else {
             // Show error feedback, allow retry
-            let workItem = DispatchWorkItem { [weak self] in
-                self?.clearAllSlots()
+            submitDelayTask = Task { @MainActor [weak self] in
+                try? await Task.sleep(nanoseconds: 500_000_000)
+                guard let self = self, !Task.isCancelled else { return }
+                self.clearAllSlots()
             }
-            submitDelayWorkItem = workItem
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: workItem)
         }
     }
 

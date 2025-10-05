@@ -14,28 +14,63 @@ class HomeViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
 
-    init() {
+    private var hasLoadedInitialData = false
+    private var loadTask: Task<Void, Never>?
+
+    func loadHomeSummaryIfNeeded() {
+        guard !hasLoadedInitialData else { return }
+        hasLoadedInitialData = true
         loadHomeSummary()
     }
 
     func loadHomeSummary() {
-        isLoading = true
-        errorMessage = nil
+        // Cancel any existing load task to prevent race conditions
+        loadTask?.cancel()
 
-        UsersAPI.getHomeSummary { [weak self] response, error in
-            DispatchQueue.main.async {
-                self?.isLoading = false
+        if AppEnvironment.shared.usesMockData {
+            loadTask = Task { @MainActor in
+                isLoading = true
+                errorMessage = nil
 
-                if let error = error {
-                    self?.errorMessage = error.userFriendlyMessage
-                    print("❌ Failed to load home summary: \(error.detailedDescription)")
-                } else if let summary = response {
-                    self?.homeSummary = summary
-                    print("✅ Home summary loaded")
-                    print("Daily progress: \(summary.progress.sentencesCompleted)/\(summary.dailyGoal.sentences)")
-                    print("Streak: \(summary.streak.current) days")
-                    print("Brain Tokens: \(summary.brainTokens.available)")
-                    print("Pattern cards: \(summary.patternCards.count)")
+                try? await Task.sleep(nanoseconds: 200_000_000)
+                guard !Task.isCancelled else { return }
+
+                let summary = MockDataProvider.shared.makeHomeSummary()
+                isLoading = false
+                handleHomeSummaryLoaded(summary)
+            }
+            return
+        }
+
+        loadTask = Task { @MainActor in
+            isLoading = true
+            errorMessage = nil
+
+            await withCheckedContinuation { continuation in
+                UsersAPI.getHomeSummary { [weak self] response, error in
+                    guard let self = self else {
+                        continuation.resume()
+                        return
+                    }
+
+                    Task { @MainActor in
+                        // Check if task was cancelled
+                        guard !Task.isCancelled else {
+                            continuation.resume()
+                            return
+                        }
+
+                        self.isLoading = false
+
+                        if let error = error {
+                            self.errorMessage = error.userFriendlyMessage
+                            print("❌ Failed to load home summary: \(error.detailedDescription)")
+                        } else if let summary = response {
+                            self.handleHomeSummaryLoaded(summary)
+                        }
+
+                        continuation.resume()
+                    }
                 }
             }
         }
@@ -43,6 +78,10 @@ class HomeViewModel: ObservableObject {
 
     func refresh() {
         loadHomeSummary()
+    }
+
+    deinit {
+        loadTask?.cancel()
     }
 
     var dailyProgress: Double {
@@ -53,5 +92,14 @@ class HomeViewModel: ObservableObject {
     var isGoalComplete: Bool {
         guard let summary = homeSummary else { return false }
         return summary.progress.sentencesCompleted >= summary.dailyGoal.sentences
+    }
+
+    private func handleHomeSummaryLoaded(_ summary: HomeSummary) {
+        homeSummary = summary
+        print("✅ Home summary loaded")
+        print("Daily progress: \(summary.progress.sentencesCompleted)/\(summary.dailyGoal.sentences)")
+        print("Streak: \(summary.streak.current) days")
+        print("Brain Tokens: \(summary.brainTokens.available)")
+        print("Pattern cards: \(summary.patternCards.count)")
     }
 }

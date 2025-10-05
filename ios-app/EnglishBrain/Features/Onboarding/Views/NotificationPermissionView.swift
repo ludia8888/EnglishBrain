@@ -28,11 +28,11 @@ struct NotificationPermissionView: View {
 
             // Title & Description
             VStack(spacing: 16) {
-                Text("알림으로 습관 만들기")
+                Text("매일 만날까요?")
                     .font(.ebH2)
                     .foregroundColor(.ebTextPrimary)
 
-                Text("매일 최적의 시간에 알림을 보내드려요.\n스트릭을 유지하고 Brain Token을 얻을 수 있어요!")
+                Text("당신이 가장 집중하는 시간에 찾아갈게요\n연속 학습과 성장 소식을 전해드릴게요")
                     .font(.ebBodyLarge)
                     .foregroundColor(.ebTextSecondary)
                     .multilineTextAlignment(.center)
@@ -44,9 +44,9 @@ struct NotificationPermissionView: View {
 
             // Benefits
             VStack(spacing: 16) {
-                BenefitRow(icon: "clock.fill", text: "개인화된 시간대 (DND 제외)")
-                BenefitRow(icon: "chart.line.uptrend.xyaxis", text: "약점 패턴 중심 리마인더")
-                BenefitRow(icon: "flame.fill", text: "스트릭 보호 Brain Token 알림")
+                BenefitRow(icon: "clock.fill", text: "방해금지 시간은 피해요")
+                BenefitRow(icon: "chart.line.uptrend.xyaxis", text: "어제 어려웠던 패턴 복습 알림")
+                BenefitRow(icon: "flame.fill", text: "연속 기록 위기 때 구조 신호")
             }
             .padding(.horizontal, 32)
 
@@ -54,7 +54,7 @@ struct NotificationPermissionView: View {
 
             // Buttons
             VStack(spacing: 12) {
-                PrimaryButton(title: "알림 받기", action: onAllow)
+                PrimaryButton(title: "알림 켜기", action: onAllow)
 
                 Button("나중에") {
                     onSkip()

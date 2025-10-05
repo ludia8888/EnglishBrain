@@ -27,10 +27,10 @@ struct BrainTokenInventoryView: View {
         .sheet(isPresented: $showFreezeSheet) {
             freezeSheetContent
         }
-        .alert("프리즈 성공", isPresented: $viewModel.showFreezeSuccess) {
+        .alert("하루 쉬기 완료", isPresented: $viewModel.showFreezeSuccess) {
             Button("확인", role: .cancel) {}
         } message: {
-            Text("스트릭이 성공적으로 보호되었습니다")
+            Text("오늘은 쉬어도 연속 기록이 안전해요")
         }
     }
 
@@ -43,7 +43,7 @@ struct BrainTokenInventoryView: View {
                     .font(.ebH4)
                     .foregroundColor(.ebTextPrimary)
 
-                Text("스트릭 프리즈에 사용하세요")
+                Text("하루 쉬고 싶을 때 사용하세요")
                     .font(.ebCaption)
                     .foregroundColor(.ebTextSecondary)
             }
@@ -61,14 +61,14 @@ struct BrainTokenInventoryView: View {
     private var tokenInventory: some View {
         HStack(spacing: 24) {
             tokenCard(
-                title: "사용 가능",
+                title: "보유 중",
                 count: viewModel.brainTokens?.available ?? 0,
                 icon: "checkmark.circle.fill",
                 color: .ebSuccess
             )
 
             tokenCard(
-                title: "획득 예정",
+                title: "곧 받을 토큰",
                 count: viewModel.brainTokens?.pending ?? 0,
                 icon: "clock.fill",
                 color: .ebWarning
@@ -100,7 +100,7 @@ struct BrainTokenInventoryView: View {
 
     private var freezeButton: some View {
         PrimaryButton(
-            title: "스트릭 프리즈 사용",
+            title: "하루 쉬기",
             action: { showFreezeSheet = true },
             isEnabled: canUseFreeze
         )
@@ -121,7 +121,7 @@ struct BrainTokenInventoryView: View {
                 HStack {
                     Image(systemName: "arrow.triangle.2.circlepath")
                         .foregroundColor(.ebWarning)
-                    Text("대기 중인 요청: \(viewModel.pendingFreezeRequests.count)개")
+                    Text("처리 대기 중 \(viewModel.pendingFreezeRequests.count)건")
                         .font(.ebCaption)
                         .foregroundColor(.ebTextSecondary)
 
@@ -130,7 +130,7 @@ struct BrainTokenInventoryView: View {
                     Button(action: {
                         viewModel.retryPendingFreezes()
                     }) {
-                        Text("재시도")
+                        Text("다시 시도")
                             .font(.ebCaption)
                             .foregroundColor(.ebPrimary)
                     }
@@ -158,7 +158,7 @@ struct BrainTokenInventoryView: View {
                 confirmButton
             }
             .padding()
-            .navigationTitle("스트릭 프리즈")
+            .navigationTitle("하루 쉬기")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -176,14 +176,14 @@ struct BrainTokenInventoryView: View {
                 .font(.system(size: 48))
                 .foregroundColor(.ebInfo)
 
-            Text("하루 쉬어도 스트릭이 유지됩니다")
+            Text("하루를 건너뛰어도 연속 기록은 이어져요")
                 .font(.ebBody)
                 .foregroundColor(.ebTextSecondary)
                 .multilineTextAlignment(.center)
 
             HStack {
                 Image(systemName: "brain.head.profile")
-                Text("1 Brain Token 소모")
+                Text("토큰 1개 사용")
             }
             .font(.ebBodySmall)
             .foregroundColor(.ebPrimary)
@@ -196,12 +196,12 @@ struct BrainTokenInventoryView: View {
 
     private var datePickerSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("프리즈 날짜")
+            Text("쉴 날짜")
                 .font(.ebH5)
                 .foregroundColor(.ebTextPrimary)
 
             DatePicker(
-                "날짜 선택",
+                "날짜를 선택하세요",
                 selection: $selectedDate,
                 in: Date()...Date().addingTimeInterval(86400 * 7),
                 displayedComponents: .date
@@ -212,7 +212,7 @@ struct BrainTokenInventoryView: View {
 
     private var reasonSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("사유 (선택)")
+            Text("이유 (선택사항)")
                 .font(.ebH5)
                 .foregroundColor(.ebTextPrimary)
 
@@ -260,7 +260,7 @@ struct BrainTokenInventoryView: View {
                     .scaleEffect(1.2)
             } else {
                 PrimaryButton(
-                    title: "프리즈 사용",
+                    title: "사용하기",
                     action: {
                         viewModel.freezeStreak(targetDate: selectedDate, reason: selectedReason)
                         showFreezeSheet = false

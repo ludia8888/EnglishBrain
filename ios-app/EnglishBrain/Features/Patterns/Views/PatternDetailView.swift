@@ -94,7 +94,7 @@ struct PatternDetailView: View {
             StatCard(
                 icon: "target",
                 value: "\(pattern.exposures)",
-                label: "노출 횟수",
+                label: "연습 횟수",
                 color: .ebInfo
             )
 
@@ -111,7 +111,7 @@ struct PatternDetailView: View {
 
     private var conquestRateChartView: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("학습 진행도")
+            Text("내 성장 단계")
                 .font(.ebH4)
                 .foregroundColor(.ebTextPrimary)
 
@@ -169,7 +169,7 @@ struct PatternDetailView: View {
 
     private var metricsGrid: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("상세 지표")
+            Text("자세한 분석")
                 .font(.ebH4)
                 .foregroundColor(.ebTextPrimary)
 
@@ -186,7 +186,7 @@ struct PatternDetailView: View {
                 if let firstTryRate = pattern.firstTryRate {
                     MetricRow(
                         icon: "target",
-                        label: "1차 성공률",
+                        label: "첫 시도 성공률",
                         value: "\(Int(firstTryRate * 100))%",
                         color: .ebSuccess
                     )
@@ -194,7 +194,7 @@ struct PatternDetailView: View {
 
                 MetricRow(
                     icon: "chart.line.uptrend.xyaxis",
-                    label: "평균 정복률",
+                    label: "평균 정답률",
                     value: "\(Int(pattern.conquestRate * 100))%",
                     color: .ebPrimary
                 )
@@ -211,7 +211,7 @@ struct PatternDetailView: View {
 
     private var recentPracticeView: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("최근 연습")
+            Text("최근 기록")
                 .font(.ebH4)
                 .foregroundColor(.ebTextPrimary)
 
@@ -257,8 +257,8 @@ struct PatternDetailView: View {
     private func trendText(_ trend: PatternConquest.Trend) -> String {
         switch trend {
         case .improving: return "개선 중"
-        case .stable: return "안정"
-        case .declining: return "하락"
+        case .stable: return "안정적"
+        case .declining: return "집중 필요"
         }
     }
 
@@ -266,7 +266,7 @@ struct PatternDetailView: View {
 
     private var reviewButtonView: some View {
         PrimaryButton(
-            title: "이 패턴 복습하기",
+            title: "지금 바로 복습하기",
             action: { showReview = true }
         )
     }

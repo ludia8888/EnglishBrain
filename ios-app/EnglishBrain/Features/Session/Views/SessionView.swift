@@ -17,7 +17,7 @@ struct SessionView: View {
             Color.ebBackground.ignoresSafeArea()
 
             if viewModel.isLoading {
-                ProgressView("세션 준비 중...")
+                ProgressView("문제 불러오는 중...")
                     .scaleEffect(1.2)
             } else if let session = viewModel.stateManager.session {
                 mainSessionView(session)
@@ -160,7 +160,7 @@ struct SessionView: View {
         VStack(spacing: 32) {
             // Prompt
             VStack(spacing: 12) {
-                Text("다음 문장을 영어로 만들어보세요")
+                Text("이 문장을 영어로 만들어볼까요?")
                     .font(.ebLabel)
                     .foregroundColor(.ebTextSecondary)
 
@@ -183,7 +183,7 @@ struct SessionView: View {
 
             // Tokens
             VStack(spacing: 16) {
-                Text("단어 선택")
+                Text("사용할 단어")
                     .font(.ebLabel)
                     .foregroundColor(.ebTextSecondary)
 
@@ -207,7 +207,7 @@ struct SessionView: View {
                 Button(action: viewModel.useHint) {
                     HStack(spacing: 8) {
                         Image(systemName: "lightbulb.fill")
-                        Text("힌트 (\(viewModel.stateManager.attemptState.hintsUsed)/\(hintBudget))")
+                        Text("힌트 (\(hintBudget - viewModel.stateManager.attemptState.hintsUsed) 남음)")
                     }
                     .font(.ebLabel)
                     .foregroundColor(viewModel.stateManager.attemptState.hintsUsed < hintBudget ? .ebInfo : .ebTextDisabled)
@@ -290,17 +290,25 @@ struct SessionView: View {
                     .foregroundColor(.ebSuccess)
 
                 if let phase = viewModel.stateManager.currentPhase {
-                    Text("\(phase.label) 완료!")
+                    let completionText: String = {
+                        switch phase.phaseType {
+                        case .warmUp: return "예열 완료!"
+                        case .focus: return "집중 구간 돌파!"
+                        case .coolDown: return "마무리 완벽!"
+                        default: return "\(phase.label) 완료!"
+                        }
+                    }()
+                    Text(completionText)
                         .font(.ebH2)
                         .foregroundColor(.white)
                 }
 
                 VStack(spacing: 12) {
-                    Text("정답률: \(Int(Double(viewModel.stateManager.totalCorrect) / Double(viewModel.stateManager.totalAttempts) * 100))%")
+                    Text("정답률 \(Int(Double(viewModel.stateManager.totalCorrect) / Double(viewModel.stateManager.totalAttempts) * 100))%")
                         .font(.ebBodyLarge)
                         .foregroundColor(.white)
 
-                    Text("최고 콤보: \(viewModel.stateManager.combo)")
+                    Text("연속 정답 최고 \(viewModel.stateManager.combo)개")
                         .font(.ebBody)
                         .foregroundColor(.white.opacity(0.8))
                 }
@@ -324,11 +332,11 @@ struct SessionView: View {
                     .font(.system(size: 80))
                     .foregroundColor(.ebWarning)
 
-                Text("세션 완료!")
+                Text("오늘 세션 완료!")
                     .font(.ebH2)
                     .foregroundColor(.white)
 
-                Text("오늘도 수고하셨습니다 🎉")
+                Text("오늘도 영어 회로가 더 단단해졌어요")
                     .font(.ebBodyLarge)
                     .foregroundColor(.white)
 
@@ -340,7 +348,7 @@ struct SessionView: View {
                         // TODO: Launch review with weak patterns from this session
                         dismiss()
                     }) {
-                        Text("약점 패턴 복습하기")
+                        Text("약점 바로 복습하기")
                             .font(.ebBody)
                             .foregroundColor(.ebPrimary)
                             .padding(.vertical, 12)
@@ -360,7 +368,7 @@ struct SessionView: View {
                     .font(.system(size: 48))
                     .foregroundColor(.ebError)
 
-                Text("세션을 시작할 수 없습니다")
+                Text("세션을 시작할 수 없어요")
                     .font(.ebH4)
                     .foregroundColor(.ebTextPrimary)
 
@@ -389,16 +397,16 @@ struct SessionView: View {
                         .frame(height: 300)
 
                     VStack(spacing: 12) {
-                        Text("Brain Burst 발동!")
+                        Text("Brain Burst 활성화!")
                             .font(.system(size: 36, weight: .black))
                             .foregroundColor(.white)
 
-                        Text("모든 점수가 \(String(format: "%.1f", burst.multiplier))배로 증가합니다")
+                        Text("이번 문장은 점수 2배 찬스!")
                             .font(.ebH4)
                             .foregroundColor(.white.opacity(0.9))
 
                         if let sessionsUntil = burst.sessionsUntilActivation, sessionsUntil > 0 {
-                            Text("다음 활성화까지 \(sessionsUntil)회 세션")
+                            Text("\(sessionsUntil)번 더 하면 또 찾아올게요")
                                 .font(.ebBody)
                                 .foregroundColor(.white.opacity(0.7))
                                 .padding(.top, 8)

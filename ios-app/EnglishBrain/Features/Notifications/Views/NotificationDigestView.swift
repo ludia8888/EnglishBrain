@@ -13,44 +13,42 @@ struct NotificationDigestView: View {
     @EnvironmentObject private var deepLinkRouter: DeepLinkRouter
 
     var body: some View {
-        NavigationView {
-            Group {
-                if viewModel.isLoading {
-                    ProgressView()
-                } else if let digest = viewModel.digest, !digest.pending.isEmpty {
-                    ScrollView {
-                        VStack(spacing: 16) {
-                            ForEach(digest.pending, id: \.notificationId) { notification in
-                                NotificationCard(
-                                    notification: notification,
-                                    onTap: {
-                                        handleNotificationTap(notification)
-                                    },
-                                    onDismiss: {
-                                        viewModel.dismissNotification(notification)
-                                    }
-                                )
-                            }
+        Group {
+            if viewModel.isLoading {
+                ProgressView()
+            } else if let digest = viewModel.digest, !digest.pending.isEmpty {
+                ScrollView {
+                    VStack(spacing: 16) {
+                        ForEach(digest.pending, id: \.notificationId) { notification in
+                            NotificationCard(
+                                notification: notification,
+                                onTap: {
+                                    handleNotificationTap(notification)
+                                },
+                                onDismiss: {
+                                    viewModel.dismissNotification(notification)
+                                }
+                            )
                         }
-                        .padding()
                     }
-                } else {
-                    emptyState
+                    .padding()
+                }
+            } else {
+                emptyState
+            }
+        }
+        .navigationTitle("알림")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    viewModel.fetchDigest()
+                } label: {
+                    Image(systemName: "arrow.clockwise")
                 }
             }
-            .navigationTitle("Notifications")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        viewModel.fetchDigest()
-                    } label: {
-                        Image(systemName: "arrow.clockwise")
-                    }
-                }
-            }
-            .onAppear {
-                viewModel.fetchDigest()
-            }
+        }
+        .task {
+            viewModel.fetchDigestIfNeeded()
         }
     }
 
@@ -60,11 +58,11 @@ struct NotificationDigestView: View {
                 .font(.system(size: 48))
                 .foregroundColor(.ebTextSecondary)
 
-            Text("No notifications")
+            Text("알림 없음")
                 .font(.ebH3)
                 .foregroundColor(.ebTextPrimary)
 
-            Text("You're all caught up!")
+            Text("모두 확인하셨어요!")
                 .font(.ebBody)
                 .foregroundColor(.ebTextSecondary)
         }
@@ -176,13 +174,13 @@ struct NotificationCard: View {
         let days = Int(interval / 86400)
 
         if days > 0 {
-            return "\(days)d ago"
+            return "\(days)일 전"
         } else if hours > 0 {
-            return "\(hours)h ago"
+            return "\(hours)시간 전"
         } else if minutes > 0 {
-            return "\(minutes)m ago"
+            return "\(minutes)분 전"
         } else {
-            return "Just now"
+            return "방금"
         }
     }
 }

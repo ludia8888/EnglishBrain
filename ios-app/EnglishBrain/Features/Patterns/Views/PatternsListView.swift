@@ -12,29 +12,27 @@ struct PatternsListView: View {
     @StateObject private var viewModel = PatternDetailViewModel()
 
     var body: some View {
-        NavigationView {
-            ZStack {
-                Color.ebBackground.ignoresSafeArea()
+        ZStack {
+            Color.ebBackground.ignoresSafeArea()
 
-                if viewModel.isLoading && viewModel.conquests.isEmpty {
-                    ProgressView()
-                        .scaleEffect(1.5)
-                } else if viewModel.dataCollectionState == .collecting {
-                    dataCollectingView
-                } else if !viewModel.conquests.isEmpty {
-                    contentView
-                } else if let errorMessage = viewModel.errorMessage {
-                    errorView(errorMessage)
-                }
+            if viewModel.isLoading && viewModel.conquests.isEmpty {
+                ProgressView()
+                    .scaleEffect(1.5)
+            } else if viewModel.dataCollectionState == .collecting {
+                dataCollectingView
+            } else if !viewModel.conquests.isEmpty {
+                contentView
+            } else if let errorMessage = viewModel.errorMessage {
+                errorView(errorMessage)
             }
-            .navigationTitle("패턴 정복")
-            .navigationBarTitleDisplayMode(.large)
-            .onAppear {
-                viewModel.loadPatternConquests()
-            }
-            .refreshable {
-                viewModel.refresh()
-            }
+        }
+        .navigationTitle("패턴 정복")
+        .navigationBarTitleDisplayMode(.large)
+        .task {
+            viewModel.loadPatternConquestsIfNeeded()
+        }
+        .refreshable {
+            viewModel.refresh()
         }
     }
 
@@ -49,7 +47,7 @@ struct PatternsListView: View {
                 // Weak Patterns
                 if !viewModel.weakPatterns.isEmpty {
                     patternSection(
-                        title: "약점 패턴",
+                        title: "집중 공략 패턴",
                         icon: "exclamationmark.triangle.fill",
                         color: .ebError,
                         patterns: viewModel.weakPatterns
@@ -59,7 +57,7 @@ struct PatternsListView: View {
                 // Improving Patterns
                 if !viewModel.improvingPatterns.isEmpty {
                     patternSection(
-                        title: "개선 중인 패턴",
+                        title: "성장 중인 패턴",
                         icon: "arrow.up.right",
                         color: .ebSuccess,
                         patterns: viewModel.improvingPatterns
@@ -69,7 +67,7 @@ struct PatternsListView: View {
                 // Mastered Patterns
                 if !viewModel.masteredPatterns.isEmpty {
                     patternSection(
-                        title: "마스터한 패턴",
+                        title: "정복한 패턴",
                         icon: "star.fill",
                         color: .ebWarning,
                         patterns: viewModel.masteredPatterns
@@ -89,7 +87,7 @@ struct PatternsListView: View {
             // Overall Progress
             HStack {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("전체 평균 정복률")
+                    Text("전체 정복률")
                         .font(.ebLabel)
                         .foregroundColor(.ebTextSecondary)
 
@@ -117,7 +115,7 @@ struct PatternsListView: View {
                         .font(.ebH3)
                         .foregroundColor(.ebTextPrimary)
 
-                    Text("학습 패턴")
+                    Text("학습한 패턴")
                         .font(.ebBodySmall)
                         .foregroundColor(.ebTextSecondary)
                 }
@@ -128,7 +126,7 @@ struct PatternsListView: View {
                         .font(.ebH3)
                         .foregroundColor(.ebTextPrimary)
 
-                    Text("총 노출")
+                    Text("총 연습 횟수")
                         .font(.ebBodySmall)
                         .foregroundColor(.ebTextSecondary)
                 }
@@ -139,7 +137,7 @@ struct PatternsListView: View {
                         .font(.ebH3)
                         .foregroundColor(.ebSuccess)
 
-                    Text("마스터")
+                    Text("정복 완료")
                         .font(.ebBodySmall)
                         .foregroundColor(.ebTextSecondary)
                 }
@@ -190,17 +188,17 @@ struct PatternsListView: View {
                 .font(.system(size: 60))
                 .foregroundColor(.ebInfo)
 
-            Text("데이터 수집 중")
+            Text("분석 데이터 모으는 중")
                 .font(.ebH3)
                 .foregroundColor(.ebTextPrimary)
 
-            Text("더 많은 세션을 완료하면\n개인화된 패턴 분석을 볼 수 있어요")
+            Text("5번만 더 학습하면\n당신만의 약점 지도를 보여드릴게요")
                 .font(.ebBody)
                 .foregroundColor(.ebTextSecondary)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
 
-            PrimaryButton(title: "세션 시작하기", action: {
+            PrimaryButton(title: "학습 시작하기", action: {
                 // Navigate to session
             })
             .frame(width: 200)
@@ -216,7 +214,7 @@ struct PatternsListView: View {
                 .font(.system(size: 48))
                 .foregroundColor(.ebError)
 
-            Text("데이터를 불러올 수 없습니다")
+            Text("데이터를 불러올 수 없어요")
                 .font(.ebH4)
                 .foregroundColor(.ebTextPrimary)
 
@@ -271,7 +269,7 @@ struct PatternConquestRow: View {
                     }
                     .foregroundColor(trendColor)
 
-                    Text("\(pattern.exposures)회 노출")
+                    Text("\(pattern.exposures)회 연습함")
                         .font(.ebCaption)
                         .foregroundColor(.ebTextSecondary)
                 }
@@ -306,9 +304,9 @@ struct PatternConquestRow: View {
 
     private var trendText: String {
         switch pattern.trend {
-        case .improving: return "개선"
-        case .stable: return "유지"
-        case .declining: return "하락"
+        case .improving: return "개선 중"
+        case .stable: return "안정"
+        case .declining: return "주의"
         }
     }
 

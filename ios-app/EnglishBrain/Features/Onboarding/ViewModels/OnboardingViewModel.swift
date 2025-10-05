@@ -41,7 +41,7 @@ class OnboardingViewModel: ObservableObject {
 
     func requestNotificationPermission(completion: @escaping (Bool) -> Void) {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 if let error = error {
                     print("Notification permission error: \(error)")
                 }
@@ -66,7 +66,7 @@ class OnboardingViewModel: ObservableObject {
         )
 
         OnboardingAPI.createTutorialCompletion(tutorialCompletionRequest: request) { [weak self] response, error in
-            DispatchQueue.main.async {
+            Task { @MainActor [weak self] in
                 self?.isLoading = false
 
                 if let error = error {

@@ -29,7 +29,7 @@ struct TutorialView: View {
     var body: some View {
         VStack(spacing: 32) {
             // Header
-            Text("3가지 피드백 채널 체험")
+            Text("세 가지 방식으로 느껴보세요")
                 .font(.ebH3)
                 .foregroundColor(.ebTextPrimary)
                 .padding(.top, 32)
@@ -46,10 +46,10 @@ struct TutorialView: View {
                 // 1. Visual Feedback
                 FeedbackChannelCard(
                     icon: "eye.fill",
-                    title: "시각 피드백",
+                    title: "눈으로",
                     color: .ebFeedbackVisual,
                     isActive: hasSeenVisual,
-                    description: "슬롯 색상과 애니메이션으로\n정답/오답을 즉시 확인"
+                    description: "정답이면 초록 불꽃이,\n오답이면 흔들림이 보여요"
                 ) {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
                         hasSeenVisual = true
@@ -59,10 +59,10 @@ struct TutorialView: View {
                 // 2. Audio Feedback
                 FeedbackChannelCard(
                     icon: "speaker.wave.2.fill",
-                    title: "청각 피드백",
+                    title: "귀로",
                     color: .ebFeedbackAudio,
                     isActive: hasPlayedAudio,
-                    description: "효과음으로 정답/오답과\n콤보 달성을 귀로 느끼기"
+                    description: "정답 벨소리, 콤보 효과음\n소리로도 성취감을 느껴보세요"
                 ) {
                     playSuccessSound()
                     hasPlayedAudio = true
@@ -71,10 +71,10 @@ struct TutorialView: View {
                 // 3. Haptic Feedback
                 FeedbackChannelCard(
                     icon: "hand.tap.fill",
-                    title: "촉각 피드백",
+                    title: "손끝으로",
                     color: .ebFeedbackHaptic,
                     isActive: hasTriggeredHaptic,
-                    description: "정교한 진동으로\n손끝에서 느끼는 성취감"
+                    description: "진동으로 손끝에 전해지는\n정답의 짜릿함"
                 ) {
                     triggerHapticFeedback()
                     hasTriggeredHaptic = true
@@ -87,16 +87,16 @@ struct TutorialView: View {
             // Complete button
             if hasSeenVisual && hasPlayedAudio && hasTriggeredHaptic {
                 VStack(spacing: 16) {
-                    Text("✅ 모든 피드백 채널을 체험했습니다!")
+                    Text("완벽해요! 이제 시작할 준비가 됐어요")
                         .font(.ebLabel)
                         .foregroundColor(.ebSuccess)
 
-                    PrimaryButton(title: "튜토리얼 완료", action: onComplete)
+                    PrimaryButton(title: "시작하기", action: onComplete)
                         .padding(.horizontal, 24)
                 }
                 .transition(.opacity)
             } else {
-                Text("각 카드를 탭하여 피드백을 체험해보세요")
+                Text("카드를 탭해서 각 피드백을 체험해보세요")
                     .font(.ebBodySmall)
                     .foregroundColor(.ebTextSecondary)
                     .padding(.horizontal, 24)
@@ -128,7 +128,8 @@ struct TutorialView: View {
         generator.notificationOccurred(.success)
 
         // Add additional impact for emphasis
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 100_000_000)
             let impact = UIImpactFeedbackGenerator(style: .medium)
             impact.impactOccurred()
         }
